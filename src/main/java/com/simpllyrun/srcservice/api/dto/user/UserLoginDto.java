@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.dto;
+package com.simpllyrun.srcservice.api.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

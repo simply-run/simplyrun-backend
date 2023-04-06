@@ -1,6 +1,7 @@
-package com.simpllyrun.srcservice.dto.user;
+package com.simpllyrun.srcservice.api.dto.user.mapper;
 
-import com.simpllyrun.srcservice.domain.User;
+import com.simpllyrun.srcservice.api.domain.User;
+import com.simpllyrun.srcservice.api.dto.user.UserLoginDto;
 
 public interface UserDtoMapper {
     static User toEntity(UserLoginDto userLogin) {

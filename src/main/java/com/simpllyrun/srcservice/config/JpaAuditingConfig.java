@@ -1,4 +1,4 @@
-package com.croquiscom.api.config;
+package com.simpllyrun.srcservice.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

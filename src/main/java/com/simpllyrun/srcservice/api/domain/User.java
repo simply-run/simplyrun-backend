@@ -1,12 +1,14 @@
-package com.croquiscom.api.domain;
+package com.simpllyrun.srcservice.api.domain;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 
@@ -25,22 +27,15 @@ public class User {
     @Column(unique = true)
     private String userId;
     private String password;
-    @ColumnDefault("15")
-    private Float leftCnt;
     @CreationTimestamp
     private LocalDate dateCreated;
     @UpdateTimestamp
     private LocalDate dateUpdated;
-
-    public void setLeftCnt(Float leftCnt) {
-        this.leftCnt = leftCnt;
-    }
 
     @Builder
     public User(Integer id, String userId, String password) {
         this.id = id;
         this.userId = userId;
         this.password = password;
-        this.leftCnt = 15f;
     }
 }

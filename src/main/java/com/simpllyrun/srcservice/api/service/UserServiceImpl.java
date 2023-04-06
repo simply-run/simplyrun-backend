@@ -1,7 +1,7 @@
-package com.croquiscom.api.service;
+package com.simpllyrun.srcservice.api.service;
 
-import com.croquiscom.api.domain.User;
-import com.croquiscom.api.repository.UserRepository;
+import com.simpllyrun.srcservice.api.domain.User;
+import com.simpllyrun.srcservice.api.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

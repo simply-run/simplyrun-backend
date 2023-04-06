@@ -1,6 +1,6 @@
-package com.croquiscom.api.repository;
+package com.simpllyrun.srcservice.api.repository;
 
-import com.croquiscom.api.domain.User;
+import com.simpllyrun.srcservice.api.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

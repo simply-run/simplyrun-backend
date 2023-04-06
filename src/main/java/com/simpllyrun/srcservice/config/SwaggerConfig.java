@@ -1,4 +1,4 @@
-package com.croquiscom.api.config;
+package com.simpllyrun.srcservice.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -14,7 +14,7 @@ public class SwaggerConfig {
     public GroupedOpenApi jwtApi() {
         String[] paths = {"/api/**"};
         return GroupedOpenApi.builder()
-                .group("휴가 신청 API")
+                .group("심플리런 API")
                 .pathsToMatch(paths)
                 .build();
     }
@@ -23,8 +23,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .components(new Components())
-                .info(new Info().title("휴가 신청 API 문서")
-                        .description("테스트 시 사용자 ID : user / 사용자 PW : 1234 사용")
+                .info(new Info().title("심플리런 API 문서")
+                        .description("설명")
                         .version("v0.0.1"));
     }
 }

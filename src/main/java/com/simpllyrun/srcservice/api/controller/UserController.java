@@ -1,6 +1,8 @@
-package com.croquiscom.api.controller;
+package com.simpllyrun.srcservice.api.controller;
 
-import com.croquiscom.api.service.UserService;
+import com.simpllyrun.srcservice.api.dto.user.UserLoginDto;
+import com.simpllyrun.srcservice.api.dto.user.mapper.UserDtoMapper;
+import com.simpllyrun.srcservice.api.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -20,6 +22,6 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "사용자 로그인")
     public Boolean userLogin(@RequestBody @Valid UserLoginDto userLogin) {
-        return true;
+        return UserService.userLogin(UserDtoMapper.toEntity(userLogin));
     }
 }
