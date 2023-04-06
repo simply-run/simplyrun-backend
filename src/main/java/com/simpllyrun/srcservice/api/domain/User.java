@@ -27,15 +27,16 @@ public class User {
     @Column(unique = true)
     private String userId;
     private String password;
+    private String name;
     @CreationTimestamp
     private LocalDate dateCreated;
     @UpdateTimestamp
     private LocalDate dateUpdated;
 
     @Builder
-    public User(Integer id, String userId, String password) {
+    public User(Integer id, String userId, String name) {
         this.id = id;
         this.userId = userId;
-        this.password = password;
+        this.name = name;
     }
 }
