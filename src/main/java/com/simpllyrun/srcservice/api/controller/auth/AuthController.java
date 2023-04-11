@@ -2,6 +2,7 @@ package com.simpllyrun.srcservice.api.controller.auth;
 
 import com.simpllyrun.srcservice.api.dto.auth.AuthDto;
 import com.simpllyrun.srcservice.api.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthDto authDto) {
+    public ResponseEntity<String> login(@RequestBody @Valid AuthDto authDto) {
         var token = authService.login(authDto.getUserId(), authDto.getPassword());
         if (token == null) {
             return ResponseEntity.badRequest().build();

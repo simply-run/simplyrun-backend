@@ -9,15 +9,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc
+@WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
     @MockBean
@@ -30,6 +32,7 @@ class AuthControllerTest {
 
 
     @Test
+    @WithMockUser // 401 에러 해결
     void loginTest() throws Exception {
         var userDto = AuthDto.builder()
                 .userId("아이디")
@@ -43,7 +46,8 @@ class AuthControllerTest {
 
         mvc.perform(post(URL + "/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
+                        .content(body)
+                        .with(csrf())) // 403 에러 해결
                 .andExpect(status().isOk());
     }
 }

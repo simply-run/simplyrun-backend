@@ -22,11 +22,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(request -> request
-                        .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests()
+                .requestMatchers("/api/users/login").authenticated()
+//                .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
+//                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll()
+                .and()
                 .csrf()
                 .disable()
                 .cors()

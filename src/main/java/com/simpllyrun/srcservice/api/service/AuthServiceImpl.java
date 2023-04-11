@@ -7,6 +7,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(String id, String password) {
-        return null;
+        return "";
     }
 }

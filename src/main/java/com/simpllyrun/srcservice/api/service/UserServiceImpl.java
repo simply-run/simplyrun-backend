@@ -17,6 +17,6 @@ public class UserServiceImpl implements UserService {
         // TODO Spring Security 적용 후 수정
         String userId = "test";
 
-        return userRepository.findByUserId(userId);
+        return userRepository.findByUserId(userId).orElse(null);
     }
 }

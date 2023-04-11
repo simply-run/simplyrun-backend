@@ -9,14 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
 @AutoConfigureMockMvc
+@WebMvcTest(UserController.class)
 class UserControllerTest {
 
     @MockBean
@@ -29,6 +31,7 @@ class UserControllerTest {
 
 
     @Test
+    @WithMockUser
     void getUserTest() throws Exception {
         User user = User.builder()
                 .userId("아이디")
@@ -39,7 +42,8 @@ class UserControllerTest {
         given(userService.getUser())
                 .willReturn(user);
 
-        mvc.perform(get(URL + "/"))
+        mvc.perform(get(URL + "/")
+                        .with(csrf()))
                 .andExpect(status().isOk());
     }
 }
