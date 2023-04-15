@@ -11,32 +11,33 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
+@Table(name = "user_follow")
 @DynamicInsert
 @DynamicUpdate
-public class User {
+public class UserFollow {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
-    private String userId;
-    private String password;
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User fromUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User toUser;
     @CreationTimestamp
-    private LocalDate dateCreated;
+    private LocalDateTime dateCreated;
     @UpdateTimestamp
-    private LocalDate dateUpdated;
+    private LocalDateTime dateUpdated;
 
     @Builder
-    public User(Long id, String userId, String name) {
-        this.id = id;
-        this.userId = userId;
-        this.name = name;
+    public UserFollow(User fromUser, User toUser) {
+        this.fromUser = fromUser;
+        this.toUser = toUser;
     }
 }
