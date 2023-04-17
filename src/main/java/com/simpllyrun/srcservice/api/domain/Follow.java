@@ -10,34 +10,33 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_follow")
+@Table(name = "follow")
 @DynamicInsert
 @DynamicUpdate
-public class UserFollow {
+public class Follow {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User fromUser;
-
+    private User user; // 팔로우 받는 사람
     @ManyToOne(fetch = FetchType.LAZY)
-    private User toUser;
+    private User followUser; // 헷갈려서 작성 user를 팔로우 하고 있는 사람
     @CreationTimestamp
     private LocalDateTime dateCreated;
     @UpdateTimestamp
     private LocalDateTime dateUpdated;
 
     @Builder
-    public UserFollow(User fromUser, User toUser) {
-        this.fromUser = fromUser;
-        this.toUser = toUser;
+    public Follow(Long id, User user, User followUser) {
+        this.id = id;
+        this.user = user;
+        this.followUser = followUser;
     }
 }

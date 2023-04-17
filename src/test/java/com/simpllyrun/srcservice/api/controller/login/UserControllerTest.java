@@ -38,7 +38,6 @@ class UserControllerTest {
                 .name("이름")
                 .build();
 
-
         given(userService.getUser())
                 .willReturn(user);
 

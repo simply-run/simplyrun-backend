@@ -1,5 +1,6 @@
 package com.simpllyrun.srcservice.api.dto.user;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.simpllyrun.srcservice.api.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +14,11 @@ public class UserDto {
 
     @NotNull
     @Schema(description = "아이디", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String id;
+    private Long id;
+
+    @NotNull
+    @Schema(description = "사용자 아이디", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String userId;
     @NotNull
     @Schema(description = "이름", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
@@ -23,8 +28,23 @@ public class UserDto {
             return null;
         }
         return UserDto.builder()
-                .id(user.getUserId())
+                .id(user.getId())
+                .userId(user.getUserId())
                 .name(user.getName())
                 .build();
+    }
+
+    @Builder
+    public UserDto(Long id, String userId, String name) {
+        this.id = id;
+        this.userId = userId;
+        this.name = name;
+    }
+
+    @QueryProjection
+    public UserDto(User user) {
+        this.id = user.getId();
+        this.userId = user.getUserId();
+        this.name = user.getName();
     }
 }
