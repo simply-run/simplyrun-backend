@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-@Schema(description = "사용자 정보 DTO")
+@Schema(description = "팔로우 DTO")
 public class FollowDto {
 
     @NotNull

@@ -1,5 +1,6 @@
 package com.simpllyrun.srcservice.api.dto.follow;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import com.simpllyrun.srcservice.api.domain.User;
 import com.simpllyrun.srcservice.api.dto.user.UserDto;
@@ -9,11 +10,17 @@ import lombok.Data;
 
 @Data
 @Builder
-@Schema(description = "사용자 정보 DTO")
+@Schema(description = "팔로워 정보 DTO")
 public class FollowerDto {
     private UserDto user;
+    @JsonProperty(value="isFollowing")
+    @Schema(description = "팔로잉 여부")
     private boolean isFollowing;
+    @JsonProperty(value="isFollower")
+    @Schema(description = "팔로워 여부")
     private boolean isFollower;
+    @JsonProperty(value="isMe")
+    @Schema(description = "자신 여부")
     private boolean isMe;
 
     @Builder
