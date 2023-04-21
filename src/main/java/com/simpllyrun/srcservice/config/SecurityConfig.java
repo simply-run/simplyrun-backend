@@ -1,6 +1,10 @@
 package com.simpllyrun.srcservice.config;
 
+import com.simpllyrun.srcservice.api.domain.Role;
+import com.simpllyrun.srcservice.api.service.CustomOAuth2UserService;
 import jakarta.servlet.DispatcherType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,7 +16,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -26,6 +33,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/users/login").authenticated()
 //                .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
 //                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/**").hasRole(Role.USER.name())
                 .anyRequest().permitAll()
                 .and()
                 .csrf()
@@ -36,7 +44,10 @@ public class SecurityConfig {
                 .disable()
                 .logout()
                 .disable()
-                .sessionManagement();
+                .sessionManagement()
+                .and().logout().logoutSuccessUrl("/")
+                .and()
+                .oauth2Login().userInfoEndpoint().userService(customOAuth2UserService);
 
         return http.build();
     }
