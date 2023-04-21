@@ -33,10 +33,27 @@ public class User {
     @UpdateTimestamp
     private LocalDate dateUpdated;
 
+    //role
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    private String email;
+
     @Builder
-    public User(Integer id, String userId, String name) {
+    public User(Integer id, String userId, String name, String email) {
         this.id = id;
         this.userId = userId;
         this.name = name;
+        this.email = email;
+    }
+
+    public User update(String name, String email){
+        this.name=name;
+        this.email=email;
+        return this;
+    }
+
+    public String getRoleKey() {
+        return this.role.getKey();
     }
 }
