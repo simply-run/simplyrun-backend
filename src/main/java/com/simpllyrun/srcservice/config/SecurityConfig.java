@@ -24,18 +24,16 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests()
                 .requestMatchers("/api/users/login").authenticated()
+                .requestMatchers("/h2-console/**").permitAll()
 //                .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
 //                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
                 .and()
-                .csrf()
-                .disable()
-                .cors()
-                .disable()
-                .formLogin()
-                .disable()
-                .logout()
-                .disable()
+                .headers().frameOptions().disable().and() // h2 접속을 위해 설정함 나중에 삭제
+                .csrf().disable()
+                .cors().disable()
+                .formLogin().disable()
+                .logout().disable()
                 .sessionManagement();
 
         return http.build();

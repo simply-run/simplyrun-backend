@@ -15,23 +15,18 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "follow")
-@DynamicInsert
-@DynamicUpdate
-public class Follow {
+public class Follow extends BaseDomain {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user; // 팔로우 받는 사람
+    @JoinColumn(name = "user_id")
+    private User user;
     @ManyToOne(fetch = FetchType.LAZY)
-    private User followUser; // 헷갈려서 작성 user를 팔로우 하고 있는 사람
-    @CreationTimestamp
-    private LocalDateTime dateCreated;
-    @UpdateTimestamp
-    private LocalDateTime dateUpdated;
+    @JoinColumn(name = "follow_user_id")
+    private User followUser;
 
     @Builder
     public Follow(Long id, User user, User followUser) {
