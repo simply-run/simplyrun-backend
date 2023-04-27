@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
-@Import(TestConfig.class)
+//@Import(TestConfig.class)
 class FollowServiceTest {
 
     @MockBean
