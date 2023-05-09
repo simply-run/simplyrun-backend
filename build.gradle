@@ -61,8 +61,15 @@ tasks.named('test') {
 
 def querydslDir = "$buildDir/generated/querydsl"
 
+ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
+
 sourceSets {
-	main.java.srcDirs += [ querydslDir ]
+	main {
+		resources {
+			srcDirs = ["src/main/resources", "src/main/resources-${profile}"]
+		}
+	}
+	main.java.srcDirs += [querydslDir]
 }
 
 tasks.withType(JavaCompile) {

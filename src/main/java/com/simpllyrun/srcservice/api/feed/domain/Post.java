@@ -22,7 +22,9 @@ public class Post extends BaseDomain {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    private CategoryEnum category;
+
+    @Enumerated(EnumType.STRING)
+    private CategoryEnum categoryType;
     private String content;
 
     @OneToMany(mappedBy = "post")
@@ -37,9 +39,10 @@ public class Post extends BaseDomain {
 
 
     @Builder
-    public Post(User user, CategoryEnum category, String content) {
+    public Post(Long id, User user, CategoryEnum categoryType, String content) {
+        this.id = id;
         this.user = user;
-        this.category = category;
+        this.categoryType = categoryType;
         this.content = content;
     }
 }
