@@ -42,7 +42,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         JwtTokenProvider.sendAccessToken(response, token);
 
         log.info("token = {}", token);
-
+        response.addHeader("Authorization","Bearer " + token);
         response.sendRedirect("/");
     }
 }
