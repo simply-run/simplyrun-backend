@@ -1,10 +1,7 @@
 package com.simpllyrun.srcservice.api.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -35,16 +32,20 @@ public class User {
 
     //role
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.USER;
 
     private String email;
 
+    @Column(name = "resource_server")
+    private String registrationId;
+
     @Builder
-    public User(Integer id, String userId, String name, String email) {
+    public User(Integer id, String userId, String name, String email, String password, String registrationId) {
         this.id = id;
         this.userId = userId;
         this.name = name;
         this.email = email;
+        this.registrationId = registrationId; //db에 Resource Server 구분
     }
 
     public User update(String name, String email){
@@ -55,5 +56,19 @@ public class User {
 
     public String getRoleKey() {
         return this.role.getKey();
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public enum Role {
+        ADMIN("ROLE_GUEST", "게스트"),
+        USER("ROLE_USER", "일반 사용자");
+
+        private final String key;
+        private final String title;
+    }
+
+    public void changeRole(Role role){
+        this.role = role;
     }
 }
