@@ -1,5 +1,6 @@
 package com.simpllyrun.srcservice.api.controller.user;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,10 @@ public class NaverLoginController {
     private String tokenUri;
 
     @GetMapping("/")
-    public String naverLogin(){
+    public String naverLogin(HttpServletResponse response){
+        String jwtToken = response.getHeader("Authorization");
+
+        log.info("Authorization ={}", jwtToken);
 
         return "login";
     }
