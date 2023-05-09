@@ -10,6 +10,12 @@ spring:
             authorization-grant-type: authorization_code
             scope: name, email
             client-name: Naver
+
+          google:
+            client-id: 472047365870-6jatb44v2mbd691qjn5hun797vovf04g.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
         provider:
           naver:
             authorization_uri: https://nid.naver.com/oauth2.0/authorize
