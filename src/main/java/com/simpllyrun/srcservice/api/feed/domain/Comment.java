@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.api.domain.feed;
+package com.simpllyrun.srcservice.api.feed.domain;
 
 import com.simpllyrun.srcservice.api.domain.BaseDomain;
 import com.simpllyrun.srcservice.api.domain.User;
@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "post")
-public class PostLike extends BaseDomain {
+@Table(name = "comment")
+public class Comment extends BaseDomain {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,14 +19,16 @@ public class PostLike extends BaseDomain {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
+    private String content;
+
 
     @Builder
-    public PostLike(User user, Post post) {
+    public Comment(User user, Post post, String content) {
         this.user = user;
         this.post = post;
+        this.content = content;
     }
 }

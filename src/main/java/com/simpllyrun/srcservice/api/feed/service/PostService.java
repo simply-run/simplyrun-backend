@@ -1,6 +1,6 @@
-package com.simpllyrun.srcservice.api.service;
+package com.simpllyrun.srcservice.api.feed.service;
 
-import com.simpllyrun.srcservice.api.dto.feed.PostDto;
+import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 
 public interface PostService {
 

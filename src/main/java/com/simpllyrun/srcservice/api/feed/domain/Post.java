@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.api.domain.feed;
+package com.simpllyrun.srcservice.api.feed.domain;
 
 import com.simpllyrun.srcservice.api.domain.BaseDomain;
 import com.simpllyrun.srcservice.api.domain.User;
