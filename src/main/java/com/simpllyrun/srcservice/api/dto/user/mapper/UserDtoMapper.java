@@ -6,7 +6,8 @@ import com.simpllyrun.srcservice.api.dto.user.UserDto;
 public interface UserDtoMapper {
     static User toEntity(UserDto userDto) {
         return User.builder()
-                .userId(userDto.getId())
+                .id(userDto.getId())
+                .userId(userDto.getUserId())
                 .name(userDto.getName())
                 .build();
     }
