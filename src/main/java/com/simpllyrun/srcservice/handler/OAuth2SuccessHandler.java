@@ -1,6 +1,6 @@
 package com.simpllyrun.srcservice.handler;
 
-import com.simpllyrun.srcservice.api.jwt.JwtTokenProvider;
+import com.simpllyrun.srcservice.api.auth.jwt.JwtTokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

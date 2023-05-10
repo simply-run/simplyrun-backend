@@ -1,7 +1,6 @@
 package com.simpllyrun.srcservice.api.feed.dto.mapper;
 
-import com.simpllyrun.srcservice.api.domain.User;
-import com.simpllyrun.srcservice.api.dto.user.UserDto;
+import com.simpllyrun.srcservice.api.user.domain.User;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 

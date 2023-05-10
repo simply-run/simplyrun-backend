@@ -1,7 +1,7 @@
 package com.simpllyrun.srcservice.api.feed.domain;
 
-import com.simpllyrun.srcservice.api.domain.BaseDomain;
-import com.simpllyrun.srcservice.api.domain.User;
+import com.simpllyrun.srcservice.api.base.domain.BaseDomain;
+import com.simpllyrun.srcservice.api.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

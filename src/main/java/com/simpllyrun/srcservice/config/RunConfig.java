@@ -1,7 +1,7 @@
 package com.simpllyrun.srcservice.config;
 
-import com.simpllyrun.srcservice.api.domain.User;
-import com.simpllyrun.srcservice.api.repository.UserRepository;
+import com.simpllyrun.srcservice.api.user.domain.User;
+import com.simpllyrun.srcservice.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;

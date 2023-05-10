@@ -3,7 +3,7 @@ package com.simpllyrun.srcservice.api.feed.service;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 import com.simpllyrun.srcservice.api.feed.dto.mapper.PostDtoMapper;
 import com.simpllyrun.srcservice.api.feed.repository.PostRepository;
-import com.simpllyrun.srcservice.api.repository.UserRepository;
+import com.simpllyrun.srcservice.api.user.repository.UserRepository;
 import com.simpllyrun.srcservice.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package com.simpllyrun.srcservice.util;
 
-import com.simpllyrun.srcservice.api.dto.auth.AccessUser;
+import com.simpllyrun.srcservice.api.auth.dto.AccessUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
