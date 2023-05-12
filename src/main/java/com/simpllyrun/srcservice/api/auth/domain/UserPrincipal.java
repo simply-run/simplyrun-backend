@@ -18,6 +18,7 @@ import java.util.Map;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class UserPrincipal implements OAuth2User, UserDetails, OidcUser {
+    private final Long id;
     private final String userId;
     private final String password;
     private final ProviderType providerType;
@@ -82,6 +83,7 @@ public class UserPrincipal implements OAuth2User, UserDetails, OidcUser {
 
     public static UserPrincipal create(User user) {
         return new UserPrincipal(
+                user.getId(),
                 user.getUserId(),
                 "",
                 user.getProviderType(),

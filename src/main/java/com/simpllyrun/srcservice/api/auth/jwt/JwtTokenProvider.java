@@ -1,23 +1,32 @@
 package com.simpllyrun.srcservice.api.auth.jwt;
 
 import io.jsonwebtoken.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Component
 @NoArgsConstructor
 public class JwtTokenProvider {
-    private static final String JWT_SECRET = "secretKeysecretsecretsecretKeysecretsecretsecretKeysecretsecret"; //길이가 짧다는 오류 발생방지 위해 길게 함
+    private final static String JWT_SECRET = "secretKeysecretsecretsecretKeysecretsecretsecretKeysecretsecret"; //길이가 짧다는 오류 발생방지 위해 길게 함
+    private final static Long JWT_EXPIRATION = 1000 * 60 * 10L; //토큰 유효시간
+    private final static String HEADER_AUTHORIZATION = "Authorization";
+    private final static String TOKEN_PREFIX = "Bearer ";
 
-    //토큰 유효시간
-    private static final Long JWT_EXPIRATION = 1000*60*10L;
-
-    public static String generateToken(String email){
+    public static String generateToken(String email) {
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + JWT_EXPIRATION);
 
@@ -36,7 +45,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public static String refreshToken(){
+    public static String refreshToken() {
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + JWT_EXPIRATION);
 
@@ -55,7 +64,7 @@ public class JwtTokenProvider {
     /**
      * AccessToken 헤더에 실어서 보내기
      */
-    public static void sendAccessToken(HttpServletResponse response, String accessToken){
+    public static void sendAccessToken(HttpServletResponse response, String accessToken) {
         response.setStatus(HttpServletResponse.SC_OK);
 
         response.addHeader("accessToken", accessToken);
@@ -65,7 +74,7 @@ public class JwtTokenProvider {
     /**
      * AccessToken + RefreshToken 헤더에 실어서 보내기
      */
-    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken){
+    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
         response.setStatus(HttpServletResponse.SC_OK);
 
         response.setHeader("accessHeader", accessToken);
@@ -75,7 +84,7 @@ public class JwtTokenProvider {
 
 
     // Jwt 토큰에서 이메일 추출
-    public static String getUserEmail(String token){
+    public static String getUserEmail(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(JWT_SECRET)
                 .parseClaimsJws(token)
@@ -93,11 +102,11 @@ public class JwtTokenProvider {
     }
 
     //토큰 유효성 + 만료일자 확인
-    public static boolean validateToken(String token){
-        try{
+    public static boolean validateToken(String token) {
+        try {
             Claims claims = Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody();
             return !claims.getExpiration().before(new Date());
-        }catch (SecurityException e) {
+        } catch (SecurityException e) {
             log.error("Invalid JWT signature", e);
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token", e);

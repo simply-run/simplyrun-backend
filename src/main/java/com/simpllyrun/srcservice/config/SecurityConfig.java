@@ -1,6 +1,10 @@
 package com.simpllyrun.srcservice.config;
 
+import com.simpllyrun.srcservice.api.auth.domain.RoleType;
+import com.simpllyrun.srcservice.api.auth.jwt.AuthTokenProvider;
 import com.simpllyrun.srcservice.api.auth.service.OAuthService;
+import com.simpllyrun.srcservice.api.exception.RestAuthenticationEntryPoint;
+import com.simpllyrun.srcservice.filter.TokenAuthenticationFilter;
 import com.simpllyrun.srcservice.handler.OAuth2FailureHandler;
 import com.simpllyrun.srcservice.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -26,6 +31,7 @@ public class SecurityConfig {
     private final OAuthService oAuthService;
     private final OAuth2SuccessHandler successHandler;
     private final OAuth2FailureHandler failureHandler;
+    private final AuthTokenProvider authTokenProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -39,15 +45,11 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/api/**").hasAnyAuthority(RoleType.USER.getKey())
 //                .requestMatchers("/oauth2/**").permitAll()
-                .anyRequest().permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable();
-//                .anyRequest().authenticated()
-//                .requestMatchers("/api/users/login").authenticated()
-                //.requestMatchers("/api/**").hasRole(User.Role.USER.getKey()) //USER 권한만 접근가능
-//                .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
-//                .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
         http
                 .sessionManagement()
@@ -55,7 +57,9 @@ public class SecurityConfig {
         http
                 .logout().logoutSuccessUrl("/").and()
                 .formLogin().disable()
-                .httpBasic().disable(); // id+pw 방식인 httpBasic이 아닌 Token을 들고가는 Bearer 방식 사용하기 위함
+                .httpBasic().disable() // id+pw 방식인 httpBasic이 아닌 Token을 들고가는 Bearer 방식 사용하기 위함
+                .exceptionHandling()
+                .authenticationEntryPoint(new RestAuthenticationEntryPoint());
         http
                 .oauth2Login() //oauth2Login 설정 시작
                 .authorizationEndpoint()
@@ -66,14 +70,16 @@ public class SecurityConfig {
                 .baseUri("/**/oauth2/code/**")
                 .and()
                 .successHandler(successHandler)
-//                .failureHandler(failureHandler)
+                .failureHandler(failureHandler)
                 .userInfoEndpoint() //oauth2Login 로그인된 유저의 정보를 가져온다.
-                .userService(oAuthService); //로그인된 유저의 정보를 customOAuth2UserService에서 처리하겠다
+                .userService(oAuthService); //로그인된 유저의 정보를 oAuthService 처리하겠다
+
+        http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-        @Bean
+    @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
@@ -88,5 +94,10 @@ public class SecurityConfig {
     @Bean
     public HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository() {
         return new HttpSessionOAuth2AuthorizationRequestRepository();
+    }
+
+    @Bean
+    public TokenAuthenticationFilter tokenAuthenticationFilter() {
+        return new TokenAuthenticationFilter(authTokenProvider);
     }
 }
