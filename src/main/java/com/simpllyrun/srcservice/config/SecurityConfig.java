@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -22,7 +23,7 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final OAuthService OAuthService;
+    private final OAuthService oAuthService;
     private final OAuth2SuccessHandler successHandler;
     private final OAuth2FailureHandler failureHandler;
 
@@ -37,34 +38,42 @@ public class SecurityConfig {
                 .cors().and()
                 .csrf().disable()
                 .authorizeHttpRequests()
+                .requestMatchers("/h2-console/**").permitAll()
+//                .requestMatchers("/oauth2/**").permitAll()
+                .anyRequest().permitAll()
+                .and()
+                .headers().frameOptions().disable();
 //                .anyRequest().authenticated()
 //                .requestMatchers("/api/users/login").authenticated()
-                .requestMatchers("/h2-console/**").permitAll()
-                .anyRequest().permitAll()
                 //.requestMatchers("/api/**").hasRole(User.Role.USER.getKey()) //USER 권한만 접근가능
 //                .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
 //                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .and()
-                .headers().frameOptions().disable();
 
         http
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS); //세션 사용 x
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS); //세션 사용 x
         http
                 .logout().logoutSuccessUrl("/").and()
                 .formLogin().disable()
                 .httpBasic().disable(); // id+pw 방식인 httpBasic이 아닌 Token을 들고가는 Bearer 방식 사용하기 위함
         http
                 .oauth2Login() //oauth2Login 설정 시작
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorization")
+                .authorizationRequestRepository(authorizationRequestRepository())
+                .and()
+                .redirectionEndpoint()
+                .baseUri("/**/oauth2/code/**")
+                .and()
                 .successHandler(successHandler)
-                .failureHandler(failureHandler)
+//                .failureHandler(failureHandler)
                 .userInfoEndpoint() //oauth2Login 로그인된 유저의 정보를 가져온다.
-                .userService(OAuthService); //로그인된 유저의 정보를 customOAuth2UserService에서 처리하겠다
+                .userService(oAuthService); //로그인된 유저의 정보를 customOAuth2UserService에서 처리하겠다
 
         return http.build();
     }
 
-    //    @Bean
+        @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
@@ -72,7 +81,12 @@ public class SecurityConfig {
         config.addAllowedOrigin("*"); //모든 ip에 응답을 허용하겠다
         config.addAllowedHeader("*"); //모든 header에 응답을 허용하겠다
         config.addAllowedMethod("*"); //모든 get, post, put, delete, patch 요청을 허용하겠다
-        source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+    }
+
+    @Bean
+    public HttpSessionOAuth2AuthorizationRequestRepository authorizationRequestRepository() {
+        return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
 }

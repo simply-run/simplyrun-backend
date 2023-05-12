@@ -19,7 +19,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid AuthDto authDto) {
-        var token = authService.login(authDto.getUserId(), authDto.getPassword());
+        var token = authService.login(authDto);
         if (token == null) {
             return ResponseEntity.badRequest().build();
         } else {

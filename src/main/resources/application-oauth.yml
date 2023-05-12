@@ -1,22 +1,24 @@
 spring:
   security:
-    oauth2:
-      client:
+    oauth2.client:
         registration:
           naver:
-            client-id: aNeAlbn7Lx2R47j_MISP
-            client-secret: UeNlHaWBPZ
-            redirect-uri: http://localhost:8080/OAuth/login
-            authorization-grant-type: authorization_code
-            scope: name, email, profile_image
-            client-name: Naver
+            clientId: u06uS4_7Pv3AaC_yGLDa
+            clientSecret: W4JSSedYYA
+            redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            authorizationGrantType: authorization_code
+            scope:
+              - name
+              - email
+              - profile_image
+            clientName: Naver
           google:
             client-id: 472047365870-6jatb44v2mbd691qjn5hun797vovf04g.apps.googleusercontent.com
             client-secret: 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
             scope: email, profile
           kakao:
-            clientId: '{카카오 client-id}'
-            clientSecret: '{카카오 client-secret}'
+            clientId: 603bb7b8a059f12f767a162d85e7a6a1
+            clientSecret: J7YgCu1k7ZSOZLnoOaE0NIXYAoYCa64s
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
             redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"

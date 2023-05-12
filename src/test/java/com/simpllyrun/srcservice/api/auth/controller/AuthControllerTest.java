@@ -42,7 +42,7 @@ class AuthControllerTest {
         var body = objectMapper.writeValueAsString(userDto);
 
 
-        given(authService.login(any(), any()))
+        given(authService.login(any()))
                 .willReturn("token");
 
         mvc.perform(post(URL + "/login")
