@@ -41,10 +41,9 @@ public class PostController {
     @PutMapping("/{postId}")
     @Operation(summary = "게시글 수정")
     public ResponseEntity<Post> updatePost(@PathVariable Long postId, @RequestBody PostDto postDto){
-        Post updatedPost = postService.updatePost(postId, postDto.getContent());
+        postService.updatePost(postId, postDto.getContent());
 
-        return ResponseEntity.ok()
-                .body(updatedPost);
+        return ResponseEntity.ok().build();
     }
 
 
