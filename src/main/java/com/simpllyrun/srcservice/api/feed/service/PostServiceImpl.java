@@ -33,12 +33,19 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void deletePost(Long postId) {
+        var post = postRepository.findById(postId).orElseThrow(()-> new IllegalArgumentException("해당 게시물은 존재하지 않습니다."));
 
+        postRepository.delete(post);
     }
 
     @Override
+    @Transactional
     public void updatePost(Long postId, String content) {
+        var post = postRepository.findById(postId).orElseThrow(()-> new IllegalArgumentException("해당 게시물은 존재하지 않습니다."));
 
+        post.update(content);
+        postRepository.save(post);
     }
 }
