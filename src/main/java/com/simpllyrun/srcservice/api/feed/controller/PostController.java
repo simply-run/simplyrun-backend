@@ -1,6 +1,7 @@
 package com.simpllyrun.srcservice.api.feed.controller;
 
 import com.simpllyrun.srcservice.api.dto.user.UserDto;
+import com.simpllyrun.srcservice.api.feed.domain.Post;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 import com.simpllyrun.srcservice.api.feed.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,4 +29,23 @@ public class PostController {
             return ResponseEntity.ok(postId);
         }
     }
+
+    @DeleteMapping("/{postId}")
+    @Operation(summary = "게시글 삭제")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId){
+        postService.deletePost(postId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{postId}")
+    @Operation(summary = "게시글 수정")
+    public ResponseEntity<Post> updatePost(@PathVariable Long postId, @RequestBody PostDto postDto){
+        Post updatedPost = postService.updatePost(postId, postDto.getContent());
+
+        return ResponseEntity.ok()
+                .body(updatedPost);
+    }
+
+
 }
