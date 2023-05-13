@@ -45,4 +45,8 @@ public class Post extends BaseDomain {
         this.categoryType = categoryType;
         this.content = content;
     }
+
+    public void update(String content){
+        this.content = content;
+    }
 }
