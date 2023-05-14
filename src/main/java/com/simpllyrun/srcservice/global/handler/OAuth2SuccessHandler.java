@@ -1,9 +1,6 @@
-package com.simpllyrun.srcservice.handler;
+package com.simpllyrun.srcservice.global.handler;
 
-import com.simpllyrun.srcservice.api.auth.domain.ProviderType;
-import com.simpllyrun.srcservice.api.auth.domain.RoleType;
 import com.simpllyrun.srcservice.api.auth.domain.UserPrincipal;
-import com.simpllyrun.srcservice.api.auth.dto.AuthUserInfo;
 import com.simpllyrun.srcservice.api.auth.jwt.AuthToken;
 import com.simpllyrun.srcservice.api.auth.jwt.AuthTokenProvider;
 import jakarta.servlet.ServletException;
@@ -12,14 +9,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * Success Handler에 진입했다는 것은, 로그인이 완료되었다는 뜻이다.
@@ -34,7 +28,7 @@ import java.util.Collection;
 @Log4j2
 @Component
 @RequiredArgsConstructor
-public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
+public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final AuthTokenProvider tokenProvider;
 
@@ -44,9 +38,18 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         AuthToken accessToken = tokenProvider.createAuthToken(user.getId().toString(), user.getRoleType().getKey());
 
-        response.addHeader(AuthTokenProvider.HEADER_AUTHORIZATION,
+        String url = makeRedirectUrl(accessToken.getToken());
+
+        /*response.addHeader(AuthTokenProvider.HEADER_AUTHORIZATION,
                 AuthTokenProvider.TOKEN_PREFIX + accessToken.getToken());
-        response.addHeader("accessToken", accessToken.getToken());
-        response.sendRedirect("/");
+        response.addHeader("accessToken", accessToken.getToken());*/
+//        response.sendRedirect("/auth/success");
+        getRedirectStrategy().sendRedirect(request, response, url);
+    }
+
+    private String makeRedirectUrl(String token) {
+        return UriComponentsBuilder.fromUriString("http://localhost:3000/oauth2/redirect")
+                .queryParam("token", token)
+                .build().toUriString();
     }
 }

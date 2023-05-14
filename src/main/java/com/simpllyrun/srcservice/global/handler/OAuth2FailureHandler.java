@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.handler;
+package com.simpllyrun.srcservice.global.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

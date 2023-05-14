@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.config;
+package com.simpllyrun.srcservice.global.config;
 
 import com.simpllyrun.srcservice.api.user.domain.User;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;

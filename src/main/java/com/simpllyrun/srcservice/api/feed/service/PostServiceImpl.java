@@ -4,7 +4,7 @@ import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 import com.simpllyrun.srcservice.api.feed.dto.mapper.PostDtoMapper;
 import com.simpllyrun.srcservice.api.feed.repository.PostRepository;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
-import com.simpllyrun.srcservice.util.AuthUtil;
+import com.simpllyrun.srcservice.global.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

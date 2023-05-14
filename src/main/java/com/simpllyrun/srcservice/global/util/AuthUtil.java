@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.util;
+package com.simpllyrun.srcservice.global.util;
 
 import com.simpllyrun.srcservice.api.auth.domain.UserPrincipal;
 import lombok.RequiredArgsConstructor;

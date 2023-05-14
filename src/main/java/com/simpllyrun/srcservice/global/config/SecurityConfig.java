@@ -1,12 +1,12 @@
-package com.simpllyrun.srcservice.config;
+package com.simpllyrun.srcservice.global.config;
 
 import com.simpllyrun.srcservice.api.auth.domain.RoleType;
 import com.simpllyrun.srcservice.api.auth.jwt.AuthTokenProvider;
 import com.simpllyrun.srcservice.api.auth.service.OAuthService;
-import com.simpllyrun.srcservice.api.exception.RestAuthenticationEntryPoint;
-import com.simpllyrun.srcservice.filter.TokenAuthenticationFilter;
-import com.simpllyrun.srcservice.handler.OAuth2FailureHandler;
-import com.simpllyrun.srcservice.handler.OAuth2SuccessHandler;
+import com.simpllyrun.srcservice.global.error.RestAuthenticationEntryPoint;
+import com.simpllyrun.srcservice.global.filter.TokenAuthenticationFilter;
+import com.simpllyrun.srcservice.global.handler.OAuth2FailureHandler;
+import com.simpllyrun.srcservice.global.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +33,8 @@ public class SecurityConfig {
     private final OAuth2FailureHandler failureHandler;
     private final AuthTokenProvider authTokenProvider;
 
+    private static final String[] AUTH_WHITELIST_SWAGGER = {"/v3/api-docs/**", "/swagger-ui/**"};
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -45,6 +47,8 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers(AUTH_WHITELIST_SWAGGER).permitAll()
+//                .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/api/**").hasAnyAuthority(RoleType.USER.getKey())
 //                .requestMatchers("/oauth2/**").permitAll()
                 .anyRequest().authenticated()

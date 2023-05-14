@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.api.exception;
+package com.simpllyrun.srcservice.global.error;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,20 +12,17 @@ import java.io.OutputStream;
 
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+        response.setStatus(ErrorCode.FORBIDDEN.getStatus());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         try (OutputStream os = response.getOutputStream()) {
             ObjectMapper objectMapper = new ObjectMapper();
-            var error = ErrorResponse.builder()
-                    .code("인증되지 않은 사용자입니다.")
-                    .status(HttpServletResponse.SC_UNAUTHORIZED)
-                    .message(authException.getMessage())
-                    .build();
-            objectMapper.writeValue(os, error);
+            objectMapper.writeValue(os, ErrorResponse.of(ErrorCode.FORBIDDEN));
             os.flush();
         }
     }

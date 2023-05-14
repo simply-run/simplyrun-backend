@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.filter;
+package com.simpllyrun.srcservice.global.filter;
 
 import com.simpllyrun.srcservice.api.auth.jwt.AuthToken;
 import com.simpllyrun.srcservice.api.auth.jwt.AuthTokenProvider;

@@ -5,7 +5,7 @@ import com.simpllyrun.srcservice.api.follow.domain.Follow;
 import com.simpllyrun.srcservice.api.follow.dto.FollowerDto;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
 import com.simpllyrun.srcservice.api.follow.repository.FollowRepository;
-import com.simpllyrun.srcservice.util.AuthUtil;
+import com.simpllyrun.srcservice.global.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
