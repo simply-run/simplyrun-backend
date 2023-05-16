@@ -1,7 +1,5 @@
 package com.simpllyrun.srcservice.api.feed.controller;
 
-import com.simpllyrun.srcservice.api.dto.user.UserDto;
-import com.simpllyrun.srcservice.api.feed.domain.Post;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 import com.simpllyrun.srcservice.api.feed.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;

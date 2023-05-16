@@ -1,6 +1,6 @@
 package com.simpllyrun.srcservice.api.feed.dto;
 
-import com.simpllyrun.srcservice.api.dto.user.UserDto;
+import com.simpllyrun.srcservice.api.user.dto.UserDto;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
