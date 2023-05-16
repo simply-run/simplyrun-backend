@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.config;
+package com.simpllyrun.srcservice.global.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

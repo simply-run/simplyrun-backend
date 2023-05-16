@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.config;
+package com.simpllyrun.srcservice.global.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
