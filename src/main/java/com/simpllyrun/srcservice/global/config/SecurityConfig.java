@@ -8,6 +8,7 @@ import com.simpllyrun.srcservice.global.filter.TokenAuthenticationFilter;
 import com.simpllyrun.srcservice.global.handler.OAuth2FailureHandler;
 import com.simpllyrun.srcservice.global.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

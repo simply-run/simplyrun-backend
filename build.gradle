@@ -53,12 +53,6 @@ dependencies {
 	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-
-
-	// JWT
-	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 }
 
 tasks.named('test') {
@@ -67,15 +61,8 @@ tasks.named('test') {
 
 def querydslDir = "$buildDir/generated/querydsl"
 
-ext.profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
-
 sourceSets {
-	main {
-		resources {
-			srcDirs = ["src/main/resources", "src/main/resources-${profile}"]
-		}
-	}
-	main.java.srcDirs += [querydslDir]
+	main.java.srcDirs += [ querydslDir ]
 }
 
 tasks.withType(JavaCompile) {
