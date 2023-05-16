@@ -38,7 +38,7 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{postId}")
+    @PatchMapping("/{postId}")
     @Operation(summary = "게시글 수정")
     public ResponseEntity<Post> updatePost(@PathVariable Long postId, @RequestBody PostDto postDto){
         postService.updatePost(postId, postDto.getContent());

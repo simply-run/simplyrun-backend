@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -50,7 +50,7 @@ class PostControllerTest {
     @BeforeEach
     public void mockMvcSetUp(){
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-//        postRepository.deleteAll();
+        postRepository.deleteAll();
 
     }
 
@@ -93,15 +93,17 @@ class PostControllerTest {
         result1.andExpect(status().isOk());
         result2.andExpect(status().isOk());
 
+        //verify
         List<Post> posts = postRepository.findAll();
 
         assertThat(posts.size()).isEqualTo(2); // post 전체 개수
-        assertThat(posts.get(0).getContent()).isEqualTo(content1); //postDto1 content 확인
         assertThat(posts.get(0).getId()).isEqualTo(1); // post의 id값 확인
+        assertThat(posts.get(0).getContent()).isEqualTo(content1); //postDto1 content 확인
 
-        assertThat(posts.get(1).getContent()).isEqualTo(content2); //postDto2 content 확인
         assertThat(posts.get(1).getId()).isEqualTo(2); //post의 id값 확인
+        assertThat(posts.get(1).getContent()).isEqualTo(content2); //postDto2 content 확인
     }
+
     @DisplayName("Post 삭제하기")
     @Test
     @WithMockUser(username = "1")
@@ -117,13 +119,18 @@ class PostControllerTest {
         postRepository.save(post);
 
         //when
-        mockMvc.perform(delete(url, post.getId()))
-                .andExpect(status().isOk());
+        ResultActions result = mockMvc.perform(delete(url, post.getId()));
 
         //then
+        result.andExpect(status().isOk());
+
+        //verify
         Optional<Post> findPost = postRepository.findById(post.getId());
 
+        System.out.println("findPost = " + findPost);
         assertThat(findPost).isEmpty();
+
+        assertThat(postRepository.existsById(post.getId())).isFalse();
     }
 
     @DisplayName("Post 수정하기")
@@ -147,13 +154,14 @@ class PostControllerTest {
         String requestBody = objectMapper.writeValueAsString(postDto);
 
         //when
-        ResultActions result = mockMvc.perform(put(url, post.getId())
+        ResultActions result = mockMvc.perform(patch(url, post.getId())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(requestBody));
 
         //then
         result.andExpect(status().isOk());
 
+        //verify
         Post findPost = postRepository.findById(post.getId()).get();
 
         System.out.println("findPost content = " + findPost.getContent());
