@@ -1,10 +1,10 @@
 package com.simpllyrun.srcservice.api.feed.service;
 
-import com.simpllyrun.srcservice.api.domain.User;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 import com.simpllyrun.srcservice.api.feed.repository.PostRepository;
-import com.simpllyrun.srcservice.api.repository.UserRepository;
+import com.simpllyrun.srcservice.api.user.domain.User;
+import com.simpllyrun.srcservice.api.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

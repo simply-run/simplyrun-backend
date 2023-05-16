@@ -1,12 +1,14 @@
 package com.simpllyrun.srcservice.api.feed.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.simpllyrun.srcservice.api.domain.User;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 import com.simpllyrun.srcservice.api.feed.repository.PostRepository;
-import com.simpllyrun.srcservice.api.repository.UserRepository;
-import org.junit.jupiter.api.*;
+import com.simpllyrun.srcservice.api.user.domain.User;
+import com.simpllyrun.srcservice.api.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,13 +22,9 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-
-import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
