@@ -1,30 +1,35 @@
 package com.simpllyrun.srcservice.api.feed.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.simpllyrun.srcservice.api.domain.User;
+
+import com.simpllyrun.srcservice.api.feed.domain.Image;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 import com.simpllyrun.srcservice.api.feed.repository.PostRepository;
-import com.simpllyrun.srcservice.api.repository.UserRepository;
+
+import com.simpllyrun.srcservice.api.user.domain.User;
+import com.simpllyrun.srcservice.api.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -58,50 +63,69 @@ class PostControllerTest {
     @DisplayName("post 생성하기")
     @Test
     @WithMockUser(username = "1")
+    @Transactional
     void addPost() throws Exception {
         //given
         final String url = "/api/posts";
-        final String content1 = "content1";
-        final String content2 = "content2";
 
-        userRepository.save(User.builder()
-                .build());
+        userRepository.save(User.builder().build());
 
-            //postDto 2개 생성
-        PostDto postDto1 = PostDto.builder()
-                .content(content1)
+        //================== @RequestPart(value = "dto") @Valid PostDto postDto ======================
+
+        //postDto 생성
+        final String content = "content";
+
+        PostDto postDto = PostDto.builder()
+                .content(content)
                 .build();
 
-        PostDto postDto2 = PostDto.builder()
-                .content(content2)
-                .build();
+        //postDto -> requestBody (json 형식으로 변환)
+        String requestBody = objectMapper.writeValueAsString(postDto);
 
-            //postDto를 requestBody로 변환
-        String requestBody1 = objectMapper.writeValueAsString(postDto1);
-        String requestBody2 = objectMapper.writeValueAsString(postDto2);
+        //requestBody -> multipartFile 형식으로 변환  //MockMultipartFile의 name은 @RequestPart의 value 값과 같아야 함 (dto)
+        MockMultipartFile dto = new MockMultipartFile("dto", "", MediaType.APPLICATION_JSON_VALUE, requestBody.getBytes(StandardCharsets.UTF_8));
+
+        //===================== @RequestPart(value = "images") List<MultipartFile> multipartFiles =========================
+        //이미지 파일 생성
+        final String fileName1 = "고양이";
+        final String fileName2 = "호랑이";
+
+        final String contentType = "png"; //확장자
+
+        //MockMultipartFile의 name은 @RequestPart의 value 값과 같아야 함 (images)
+        MockMultipartFile imageFile1 = new MockMultipartFile("images", fileName1 + "." + contentType, MediaType.IMAGE_PNG_VALUE, "images".getBytes()); //이 방식도 가능
+        MockMultipartFile imageFile2 = new MockMultipartFile("images", fileName2 + "." + contentType, "image/png", "<<png data>>".getBytes());
+
 
         //when
-        ResultActions result1 = mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody1));
+        ResultActions result = mockMvc.perform(multipart(url)
+                .file(imageFile1).file(imageFile2).file(dto)
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .characterEncoding("UTF-8"));
 
-        ResultActions result2 = mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody2));
 
         //then
-        result1.andExpect(status().isOk());
-        result2.andExpect(status().isOk());
+        result.andExpect(status().isOk());
 
         //verify
         List<Post> posts = postRepository.findAll();
 
-        assertThat(posts.size()).isEqualTo(2); // post 전체 개수
-        assertThat(posts.get(0).getId()).isEqualTo(1); // post의 id값 확인
-        assertThat(posts.get(0).getContent()).isEqualTo(content1); //postDto1 content 확인
+        assertThat(posts.size()).isEqualTo(1); // post 전체 개수
 
-        assertThat(posts.get(1).getId()).isEqualTo(2); //post의 id값 확인
-        assertThat(posts.get(1).getContent()).isEqualTo(content2); //postDto2 content 확인
+        System.out.println("=============================== post 검증 ================================");
+        assertThat(posts.get(0).getId()).isEqualTo(1); // post의 id값 확인
+        assertThat(posts.get(0).getContent()).isEqualTo(content); //postDto content 확인
+
+        System.out.println("post에 저장된 image의 개수 = "+ posts.get(0).getPostImages().size());
+
+        assertThat(posts.get(0).getPostImages().get(0).getOriginalFilename()).isEqualTo(fileName1+"."+contentType); //fileName1 확인
+        System.out.println("post에 저장된 첫번째 image의 originalFilename = " + posts.get(0).getPostImages().get(0).getOriginalFilename());
+        System.out.println("post에 저장된 첫번째 image의 storeFilename = " + posts.get(0).getPostImages().get(0).getStoreFilename());
+
+        assertThat(posts.get(0).getPostImages().get(1).getOriginalFilename()).isEqualTo(fileName2+"."+contentType); //fileName2 확인
+        System.out.println("post에 저장된 두번째 image의 originalFilename = " + posts.get(0).getPostImages().get(1).getOriginalFilename());
+        System.out.println("post에 저장된 두번째 image의 storeFilename = " + posts.get(0).getPostImages().get(1).getStoreFilename());
+
     }
 
     @DisplayName("Post 삭제하기")
@@ -117,6 +141,7 @@ class PostControllerTest {
                 .build();
 
         postRepository.save(post);
+        System.out.println("postId = " + post.getId());
 
         //when
         ResultActions result = mockMvc.perform(delete(url, post.getId()));
@@ -136,35 +161,57 @@ class PostControllerTest {
     @DisplayName("Post 수정하기")
     @Test
     @WithMockUser(username = "1")
+    @Transactional
     void updatePost() throws Exception {
         //given
         final String url = "/api/posts/{id}";
         final String content = "content";
         final String updateContent = "update content";
+        final List<Image> postImages = new ArrayList<>();
 
-        Post post = Post.builder()
-                .content(content).build();
+        Post post1 = Post.builder()
+                .content(content)
+                .postImages(postImages)
+                .build();
 
-        postRepository.save(post);
+        Post post2 = Post.builder()
+                .content(content)
+                .postImages(postImages)
+                .build();
+
+        postRepository.save(post1);
+        postRepository.save(post2);
 
         PostDto postDto = PostDto.builder()
                 .content(updateContent)
                 .build();
 
         String requestBody = objectMapper.writeValueAsString(postDto);
+        MockMultipartFile dto = new MockMultipartFile("dto", "", MediaType.APPLICATION_JSON_VALUE, requestBody.getBytes(StandardCharsets.UTF_8));
+        MockMultipartFile imageFile = new MockMultipartFile("images", "update.png", MediaType.IMAGE_PNG_VALUE, "images".getBytes());
 
         //when
-        ResultActions result = mockMvc.perform(patch(url, post.getId())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(requestBody));
+        //content만 변경
+        ResultActions result = mockMvc.perform(multipart(HttpMethod.PATCH, url,post1.getId())
+                .file(dto));
+
+        //content 변경, imageFile 추가
+        ResultActions result2 = mockMvc.perform(multipart(HttpMethod.PATCH, url,post2.getId())
+                .file(dto).file(imageFile));
 
         //then
         result.andExpect(status().isOk());
+        result2.andExpect(status().isOk());
 
         //verify
-        Post findPost = postRepository.findById(post.getId()).get();
+        Post findPost1 = postRepository.findById(post1.getId()).get();
+        System.out.println("findPost1 content = " + findPost1.getContent());
+        assertThat(findPost1.getContent()).isEqualTo(updateContent);
 
-        System.out.println("findPost content = " + findPost.getContent());
-        assertThat(findPost.getContent()).isEqualTo(updateContent);
+        Post findPost2 = postRepository.findById(post2.getId()).get();
+        System.out.println("findPost2 content = " + findPost2.getContent());
+        assertThat(findPost2.getContent()).isEqualTo(updateContent);
+        System.out.println("postImage originalFilename = "+findPost2.getPostImages().get(0).getOriginalFilename());
+        assertThat(findPost2.getPostImages().get(0).getOriginalFilename()).isEqualTo("update.png");
     }
 }
