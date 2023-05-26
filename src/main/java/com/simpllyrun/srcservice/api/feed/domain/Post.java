@@ -32,6 +32,9 @@ public class Post extends BaseDomain {
     @OneToMany(mappedBy = "post")
     private List<PostLike> postLikes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post")
+    private List<Image> postImages = new ArrayList<>();
+
 
     public enum CategoryEnum {
         COMMUNITY, MARKET, MARATHON, CREW, QNA
@@ -39,14 +42,16 @@ public class Post extends BaseDomain {
 
 
     @Builder
-    public Post(Long id, User user, CategoryEnum categoryType, String content) {
+    public Post(Long id, User user, CategoryEnum categoryType, String content, List<Image> postImages) {
         this.id = id;
         this.user = user;
         this.categoryType = categoryType;
         this.content = content;
+        this.postImages = postImages;
     }
 
     public void update(String content){
         this.content = content;
     }
+    public void updateImage(List<Image> postImages){this.postImages = postImages;}
 }
