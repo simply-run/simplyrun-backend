@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface PostService {
 
-    Long createPost(PostDto postDto, List<MultipartFile> multipartFile);
+    Long createPost(PostDto postDto, List<MultipartFile> multipartFiles);
     void deletePost(Long postId);
     void updatePost(Long postId, String content, List<MultipartFile> multipartFiles);
 }
