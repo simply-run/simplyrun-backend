@@ -47,7 +47,7 @@ public class User extends BaseDomain {
     }
 
     @Builder
-    public User(Long id, String userOAuthId,String userId, String name, String email, String profileImageUrl, ProviderType providerType, RoleType roleType) {
+    public User(Long id, String userOAuthId, String userId, String name, String email, String profileImageUrl, ProviderType providerType, RoleType roleType) {
         this.id = id;
         this.userOAuthId = userOAuthId;
         this.userId = userId;
