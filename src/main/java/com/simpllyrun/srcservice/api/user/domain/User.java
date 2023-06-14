@@ -17,6 +17,7 @@ public class User extends BaseDomain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String userOAuthId;
     @Column(unique = true, length = 50)
     private String userId;
     private String name;
@@ -46,8 +47,9 @@ public class User extends BaseDomain {
     }
 
     @Builder
-    public User(Long id, String userId, String name, String email, String profileImageUrl, ProviderType providerType, RoleType roleType) {
+    public User(Long id, String userOAuthId, String userId, String name, String email, String profileImageUrl, ProviderType providerType, RoleType roleType) {
         this.id = id;
+        this.userOAuthId = userOAuthId;
         this.userId = userId;
         this.name = name;
         this.email = email;

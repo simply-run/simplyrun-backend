@@ -59,7 +59,9 @@ public class OAuthService extends DefaultOAuth2UserService {
 
     private User createUser(AuthUserInfo userInfo, ProviderType providerType) {
         return User.builder()
-                .userId(userInfo.getId())
+                .userOAuthId(userInfo.getId())
+                .userId(userInfo.getEmail().indexOf("@") > 0 ?
+                        userInfo.getEmail().substring(0, userInfo.getEmail().indexOf("@")) : userInfo.getEmail())
                 .name(userInfo.getName())
                 .email(userInfo.getEmail())
                 .profileImageUrl(userInfo.getImageUrl())
