@@ -1,22 +1,15 @@
 package com.simpllyrun.srcservice.api.feed.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
-import com.simpllyrun.srcservice.api.feed.dto.PostCreateDto;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
-import com.simpllyrun.srcservice.api.feed.repository.PostRepositoryCustom;
 import com.simpllyrun.srcservice.api.feed.service.post.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +27,9 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "게시글 작성")
-    public ResponseEntity<Long> addPost(@RequestPart(value = "dto") @Valid PostCreateDto postDto,
-                                        @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles){
+    @Operation(summary = "게시글 작성", description = "스웨거에선 작동x , 포스트맨에서는 작동o")
+    public ResponseEntity<Long> addPost(@RequestPart(value = "dto") @Valid @Parameter(name = "postDto", description = "게시글 생성에 필요한 내용") PostDto.PostRequestDto postDto,
+                                        @RequestPart(value = "multipartFiles", required = false) @Parameter(name = "multipartFiles", description = "사진이나 동영상") List<MultipartFile> multipartFiles){
         Long postId = postService.createPost(postDto, multipartFiles);
         if (postId == null) {
             return ResponseEntity.notFound().build();
@@ -47,26 +40,27 @@ public class PostController {
 
     @DeleteMapping("/{postId}")
     @Operation(summary = "게시글 삭제")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId){
+    public ResponseEntity<Void> deletePost(@PathVariable @Parameter(name = "postId", description = "삭제할 게시글의 id값") Long postId){
         postService.deletePost(postId);
 
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(value = "/{postId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "게시글 수정")
-    public ResponseEntity<Void> updatePost(@PathVariable Long postId, @RequestPart(value = "dto") PostDto postDto, @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles){
-        postService.updatePost(postId, postDto.getContent(), multipartFiles);
+    @PutMapping(value = "/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(summary = "게시글 수정", description = "스웨거에선 작동x , 포스트맨에서는 작동o")
+    public ResponseEntity<Void> updatePost(@PathVariable @Parameter(name = "postId", description = "수정할 게시글의 id값") Long postId,
+                                           @RequestPart(value = "dto") @Valid @Parameter(name = "postDto", description = "게시글 수정에 필요한 내용") PostDto.PostRequestDto postDto,
+                                           @RequestPart(value = "multipartFiles", required = false) @Parameter(name = "multipartFiles", description = "사진이나 동영상") List<MultipartFile> multipartFiles){
+        postService.updatePost(postId, postDto, multipartFiles);
 
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{postId}")
     @Operation(summary = "게시글 조회")
-    public ResponseEntity<PostDto> findPost(@Parameter(name = "postId", description = "post의 id")
-                                                @PathVariable Long postId){
+    public ResponseEntity<PostDto.PostResponseDto> findPost(@PathVariable @Parameter(name = "postId", description = "조회할 게시글의 id") Long postId){
 
-        PostDto postDto = postService.findPostById(postId);
+        PostDto.PostResponseDto postDto = postService.findPostById(postId);
 
         if (postId == null) {
             return ResponseEntity.notFound().build();
@@ -77,22 +71,22 @@ public class PostController {
 
     @GetMapping("/list/{userId}")
     @Operation(summary = "userId의 게시글 전체 조회")
-    public ResponseEntity<Page<PostDto>> findAllPostByUserId(@Parameter(name = "userId", description = "사용자 아이디,, 예)invigorating92 ")
+    public ResponseEntity<Page<PostDto.PostResponseDto>> findAllPostByUserId(@Parameter(name = "userId", description = "사용자 아이디,, 예)invigorating92 ")
                                                                  @PathVariable("userId") String userId,
-                                                             @PageableDefault(page = 0, size = 10) Pageable pageable){
+                                                             @PageableDefault(page = 0, size = 10) @Parameter(name = "pageable", hidden = true) Pageable pageable){
 
         Page<Post> findPostPage = postService.findAllByUserId(userId, pageable);
-        Page<PostDto> postDtoPage = findPostPage.map(post -> PostDto.of(post));
+        Page<PostDto.PostResponseDto> postDtoPage = findPostPage.map(post -> PostDto.PostResponseDto.of(post));
 
         return ResponseEntity.ok(postDtoPage);
     }
 
     @GetMapping("/list")
     @Operation(summary = "게시글 전체 조회")
-    public ResponseEntity<Page<PostDto>> findAllPost(@PageableDefault(page = 0, size = 10) Pageable pageable){
+    public ResponseEntity<Page<PostDto.PostResponseDto>> findAllPost(@PageableDefault(page = 0, size = 10) @Parameter(name = "pageable", hidden = true) Pageable pageable){
 
         Page<Post> findAll = postService.findAll(pageable);
-        Page<PostDto> postDtoPage = findAll.map(post -> PostDto.of(post));
+        Page<PostDto.PostResponseDto> postDtoPage = findAll.map(post -> PostDto.PostResponseDto.of(post));
 
         return ResponseEntity.ok(postDtoPage);
     }
