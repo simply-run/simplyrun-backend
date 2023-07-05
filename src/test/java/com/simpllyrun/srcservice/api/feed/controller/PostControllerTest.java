@@ -3,9 +3,8 @@ package com.simpllyrun.srcservice.api.feed.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.simpllyrun.srcservice.api.feed.domain.*;
-import com.simpllyrun.srcservice.api.feed.dto.PostCreateDto;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
-import com.simpllyrun.srcservice.api.feed.repository.PostRepository;
+import com.simpllyrun.srcservice.api.feed.repository.post.PostRepository;
 
 import com.simpllyrun.srcservice.api.feed.service.post.PostService;
 import com.simpllyrun.srcservice.api.user.domain.User;
@@ -37,7 +36,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -81,7 +79,8 @@ class PostControllerTest {
 
         //================== @RequestPart(value = "dto") @Valid PostDto postDto ======================
             //postDto 생성
-        PostCreateDto postDto = PostCreateDto.builder()
+        PostDto.PostRequestDto postDto = PostDto.PostRequestDto.builder()
+                .title("title")
                 .content("content")
                 .category(Post.CategoryEnum.COMMUNITY)
                 .user(userDto)
@@ -96,8 +95,8 @@ class PostControllerTest {
         //===================== @RequestPart(value = "images") List<MultipartFile> multipartFiles =========================
             //이미지 파일 생성
             //MockMultipartFile의 name은 @RequestPart의 value 값과 같아야 함 (images)
-        MockMultipartFile imageFile1 = new MockMultipartFile("images", "고양이.png", MediaType.IMAGE_PNG_VALUE, "images".getBytes()); //이 방식도 가능
-        MockMultipartFile imageFile2 = new MockMultipartFile("images", "호랑이.png", "image/png", "<<png data>>".getBytes());
+        MockMultipartFile imageFile1 = new MockMultipartFile("multipartFiles", "고양이.png", MediaType.IMAGE_PNG_VALUE, "images".getBytes()); //이 방식도 가능
+        MockMultipartFile imageFile2 = new MockMultipartFile("multipartFiles", "호랑이.png", "image/png", "<<png data>>".getBytes());
 
         List<MultipartFile> multipartFiles = new ArrayList<>();
         multipartFiles.add(imageFile1);
@@ -125,7 +124,7 @@ class PostControllerTest {
     @WithMockUser(username = "1")
     void deletePost() throws Exception {
         //given
-        final String url = "/api/posts/{postId}";
+        final String URL = "/api/posts/{postId}";
         final String content = "content";
 
         Post post = Post.builder()
@@ -137,7 +136,7 @@ class PostControllerTest {
         System.out.println("postId = " + post.getId());
 
         //when
-        ResultActions result = mockMvc.perform(delete(url, 1L));
+        ResultActions result = mockMvc.perform(delete(URL, 1L));
 
         //then
         result.andExpect(status().isOk())
@@ -150,28 +149,32 @@ class PostControllerTest {
     @WithMockUser(username = "1")
     void updatePost() throws Exception {
         //given
-        final String url = "/api/posts/{id}";
+        final String URL = "/api/posts/{id}";
+        final String title = "title";
+        final String updateTitle = "update title";
         final String content = "content";
         final String updateContent = "update content";
         final List<PostImage> postImages = new ArrayList<>();
 
         Post post = Post.builder()
                 .id(1L)
+                .title(title)
                 .content(content)
                 .build();
         post.updateImage(postImages);
 
 
-        PostCreateDto postDto = PostCreateDto.builder()
+        PostDto.PostRequestDto postDto = PostDto.PostRequestDto.builder()
+                .title(updateTitle)
                 .content(updateContent)
                 .build();
 
         String requestBody = objectMapper.writeValueAsString(postDto);
         MockMultipartFile dto = new MockMultipartFile("dto", "", MediaType.APPLICATION_JSON_VALUE, requestBody.getBytes(StandardCharsets.UTF_8));
-        MockMultipartFile imageFile = new MockMultipartFile("images", "update.png", MediaType.IMAGE_PNG_VALUE, "images".getBytes());
+        MockMultipartFile imageFile = new MockMultipartFile("multipartFiles", "update.png", MediaType.IMAGE_PNG_VALUE, "images".getBytes());
 
         //when
-        ResultActions result = mockMvc.perform(multipart(HttpMethod.PUT, url,post.getId())
+        ResultActions result = mockMvc.perform(multipart(HttpMethod.PUT, URL, post.getId())
                 .file(dto).file(imageFile));
 
         //then
@@ -184,14 +187,15 @@ class PostControllerTest {
     @WithMockUser(username = "1")
     void findPost() throws Exception {
         //given
-        final String url = "/api/posts/{postId}";
+        final String URL = "/api/posts/{postId}";
 
         User postUser = User.builder().id(1L).userId("ims98923").name("이민석").profileImageUrl("http://s3").build();
 
-        User commentUser = User.builder().id(2L).userId("khw2531").name("김현우").profileImageUrl("http://s4").build();
+        User commentUser = User.builder().id(2L).userId("khw2531").name("김현우").profileImageUrl("http://s3").build();
 
         Post post = Post.builder()
                 .id(1L)
+                .title("title")
                 .content("content")
                 .categoryType(Post.CategoryEnum.COMMUNITY)
                 .user(postUser)
@@ -218,10 +222,10 @@ class PostControllerTest {
 
         given(postRepository.save(any())).willReturn(post);
         given(postRepository.findById(any())).willReturn(Optional.of(post));
-        given(postService.findPostById(any())).willReturn(PostDto.of(post));
+        given(postService.findPostById(any())).willReturn(PostDto.PostResponseDto.of(post));
 
         //when
-        ResultActions result = mockMvc.perform(get(url, 1L));
+        ResultActions result = mockMvc.perform(get(URL, 1L));
 
         //then
         result.andExpect(status().isOk())
@@ -232,14 +236,16 @@ class PostControllerTest {
     @Test
     void findAllByUserId() throws Exception {
         //given
+        final String URL = "/api/posts/list/{userId}";
+
         User user1 = User.builder().id(1L)
                 .userId("user1").build();
 
 
         List<Post> postList = new ArrayList<>();
-        Post post1 = Post.builder().id(1L).content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        Post post2 = Post.builder().id(2L).content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        Post post3 = Post.builder().id(3L).content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
+        Post post1 = Post.builder().id(1L).title("title1").content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
+        Post post2 = Post.builder().id(2L).title("title2").content("content2").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
+        Post post3 = Post.builder().id(3L).title("title3").content("content3").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
         postList.add(post1);
         postList.add(post2);
         postList.add(post3);
@@ -251,7 +257,7 @@ class PostControllerTest {
         given(postService.findAllByUserId(anyString(), eq(pageRequest))).willReturn(postPageImpl);
 
         //when
-        ResultActions result = mockMvc.perform(get("/api/posts/list/{userId}", "user1", pageRequest));
+        ResultActions result = mockMvc.perform(get(URL, "user1", pageRequest));
 
         //then
         result.andExpect(status().isOk())
@@ -263,13 +269,15 @@ class PostControllerTest {
     @Test
     void findAllPost() throws Exception {
         //given
+        final String URL = "/api/posts/list";
+
         User user1 = User.builder().id(1L)
                 .userId("user1").build();
 
         List<Post> postList = new ArrayList<>();
-        Post post1 = Post.builder().id(1L).content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        Post post2 = Post.builder().id(2L).content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        Post post3 = Post.builder().id(3L).content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
+        Post post1 = Post.builder().id(1L).title("title1").content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
+        Post post2 = Post.builder().id(2L).title("title2").content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
+        Post post3 = Post.builder().id(3L).title("title3").content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
         postList.add(post1);
         postList.add(post2);
         postList.add(post3);
@@ -279,7 +287,7 @@ class PostControllerTest {
 
         given(postService.findAll(any())).willReturn(postPageImpl);
         //when
-        ResultActions result = mockMvc.perform(get("/api/posts/list", pageRequest));
+        ResultActions result = mockMvc.perform(get(URL, pageRequest));
 
         //then
         result.andExpect(status().isOk())
