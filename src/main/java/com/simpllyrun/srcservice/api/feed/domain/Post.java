@@ -16,42 +16,47 @@ import java.util.List;
 @Table(name = "post")
 public class Post extends BaseDomain {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @Enumerated(EnumType.STRING)
     private CategoryEnum categoryType;
+
+    private String title;
     private String content;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
-    @OneToMany(mappedBy = "post")
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<PostLike> postLikes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post")
-    private List<Image> postImages = new ArrayList<>();
-
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE}, orphanRemoval = true)
+    private List<PostImage> postImages = new ArrayList<>();
 
     public enum CategoryEnum {
-        COMMUNITY, MARKET, MARATHON, CREW, QNA
+        COMMUNITY, MARKET, MARATHON, CREW, QNA, RECOMMEND
     }
 
 
     @Builder
-    public Post(Long id, User user, CategoryEnum categoryType, String content, List<Image> postImages) {
+    public Post(Long id, User user, CategoryEnum categoryType, String title, String content) {
         this.id = id;
         this.user = user;
         this.categoryType = categoryType;
+        this.title = title;
         this.content = content;
-        this.postImages = postImages;
     }
 
-    public void update(String content){
+    public void updateText(String title, String content){
+        this.title = title;
         this.content = content;
     }
-    public void updateImage(List<Image> postImages){this.postImages = postImages;}
+    public void updateImage(List<PostImage> postImages){this.postImages = postImages;}
+    public void updateComments(List<Comment> comments){this.comments = comments;}
+    public void updatePostLikes(List<PostLike> postLikes){this.postLikes = postLikes;}
 }
