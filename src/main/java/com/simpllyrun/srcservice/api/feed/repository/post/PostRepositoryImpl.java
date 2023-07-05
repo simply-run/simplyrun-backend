@@ -1,4 +1,4 @@
-package com.simpllyrun.srcservice.api.feed.repository;
+package com.simpllyrun.srcservice.api.feed.repository.post;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
