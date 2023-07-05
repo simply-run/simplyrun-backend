@@ -1,15 +1,15 @@
 package com.simpllyrun.srcservice.api.feed.dto.mapper;
 
-import com.simpllyrun.srcservice.api.feed.domain.Image;
-import com.simpllyrun.srcservice.api.feed.dto.ImageDto;
+import com.simpllyrun.srcservice.api.feed.domain.PostImage;
+import com.simpllyrun.srcservice.api.feed.dto.PostImageDto;
 
 public interface ImageDtoMapper {
 
-    static Image toEntity(ImageDto imageDto){
-        return Image.builder()
-                .id(imageDto.getId())
-                .originalFilename(imageDto.getOriginalFilename())
-                .storeFilename(imageDto.getStoreFilename())
+    static PostImage toEntity(PostImageDto postImageDto){
+        return PostImage.builder()
+                .originalFilename(postImageDto.getOriginalFilename())
+                .storeFilename(postImageDto.getStoreFilename())
+                .postImageUrl(postImageDto.getPostImageUrl())
                 .build();
     }
 }
