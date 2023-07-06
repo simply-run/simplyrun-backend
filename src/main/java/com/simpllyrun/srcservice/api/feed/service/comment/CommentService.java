@@ -15,5 +15,7 @@ public interface CommentService {
 
     CommentDto findCommentById(Long commentId);
 
-    Page<Comment> findAll(Pageable pageable);
+    Page<Comment> findAllByPostId(Long postId, Pageable pageable);
+
+    Page<Comment> findAllByUserId(String userId, Pageable pageable);
 }

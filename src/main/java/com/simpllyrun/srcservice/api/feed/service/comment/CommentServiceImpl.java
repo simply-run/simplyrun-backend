@@ -4,7 +4,7 @@ import com.simpllyrun.srcservice.api.feed.domain.Comment;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
 import com.simpllyrun.srcservice.api.feed.dto.CommentDto;
 import com.simpllyrun.srcservice.api.feed.repository.CommentRepository;
-import com.simpllyrun.srcservice.api.feed.repository.PostRepository;
+import com.simpllyrun.srcservice.api.feed.repository.post.PostRepository;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
 import com.simpllyrun.srcservice.global.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
@@ -65,11 +65,24 @@ public class CommentServiceImpl implements CommentService{
         return CommentDto.of(comment);
     }
 
+    //특정 게시글의 전체 댓글
     @Override
-    public Page<Comment> findAll(Pageable pageable) {
-        Page<Comment> commentPage = commentRepository.findAll(pageable);
+    @Transactional(readOnly = true)
+    public Page<Comment> findAllByPostId(Long postId, Pageable pageable) {
+        postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException("해당 게시글은 존재하지 않습니다"));
+        Page<Comment> commentPage = commentRepository.findAllByPostId(postId, pageable);
         return commentPage;
     }
+
+    //특정 유저의 전체 댓글
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Comment> findAllByUserId(String userId, Pageable pageable) {
+        userRepository.findByUserId(userId).orElseThrow(()-> new NoSuchElementException("해당 유저는 존재하지 않습니다"));
+        Page<Comment> commentPage = commentRepository.findAllByUserId(userId, pageable);
+        return commentPage;
+    }
+
 
 
 }
