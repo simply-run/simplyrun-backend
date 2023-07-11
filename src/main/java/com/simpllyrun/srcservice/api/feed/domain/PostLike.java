@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "post")
+@Table(name = "post_like")
 public class PostLike extends BaseDomain {
 
     @Id
