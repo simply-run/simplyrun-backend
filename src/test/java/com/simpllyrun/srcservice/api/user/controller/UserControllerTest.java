@@ -41,7 +41,7 @@ class UserControllerTest {
         given(userService.getUser())
                 .willReturn(user);
 
-        mvc.perform(get(URL + "/")
+        mvc.perform(get(URL)
                         .with(csrf()))
                 .andExpect(status().isOk());
     }

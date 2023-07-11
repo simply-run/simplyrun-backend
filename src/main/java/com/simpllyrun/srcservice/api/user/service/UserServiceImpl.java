@@ -2,8 +2,11 @@ package com.simpllyrun.srcservice.api.user.service;
 
 import com.simpllyrun.srcservice.api.user.domain.User;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
+import com.simpllyrun.srcservice.global.util.AuthUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
 
 @Service
 @AllArgsConstructor
@@ -13,9 +16,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUser() {
-        // TODO Spring Security 적용 후 수정
-        String userId = "test";
+        Long userId = AuthUtil.getAuthUserId();
 
-        return userRepository.findByUserId(userId).orElse(null);
+        return userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
     }
 }

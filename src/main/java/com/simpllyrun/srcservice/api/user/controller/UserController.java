@@ -18,7 +18,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(summary = "사용자 조회")
     public ResponseEntity<UserDto> getUser() {
         var user = UserDto.of(userService.getUser());
