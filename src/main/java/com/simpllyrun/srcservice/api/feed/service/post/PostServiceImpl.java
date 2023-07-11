@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.simpllyrun.srcservice.global.error.ErrorCode.INPUT_VALUE_INVALID;
+
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
@@ -59,7 +61,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void deletePost(Long postId) {
-        var post = postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException("해당 게시물은 존재하지 않습니다"));
+        var post = postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
 
         postRepository.delete(post);
     }
@@ -67,7 +69,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void updatePost(Long postId, PostDto.PostRequestDto postDto, List<MultipartFile> multipartFiles) {
-        var post = postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException("해당 게시물은 존재하지 않습니다."));
+        var post = postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
         List<PostImage> postImages = post.getPostImages();
 
         if (multipartFiles != null){

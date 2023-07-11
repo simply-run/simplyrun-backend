@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
+import static com.simpllyrun.srcservice.global.error.ErrorCode.INPUT_VALUE_INVALID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +48,7 @@ public class CommentServiceImpl implements CommentService{
     @Override
     @Transactional
     public void updateComment(Long commentId, CommentDto commentDto) {
-        var comment = commentRepository.findById(commentId).orElseThrow(() -> new NoSuchElementException("해당 댓글은 존재하지 않습니다"));
+        var comment = commentRepository.findById(commentId).orElseThrow(() -> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
         comment.updateContent(commentDto.getContent());
         commentRepository.save(comment);
     }
@@ -54,14 +56,14 @@ public class CommentServiceImpl implements CommentService{
     @Override
     @Transactional
     public void deleteComment(Long commentId) {
-        var comment = commentRepository.findById(commentId).orElseThrow(() -> new NoSuchElementException("해당 댓글은 존재하지 않습니다"));
+        var comment = commentRepository.findById(commentId).orElseThrow(() -> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
         commentRepository.delete(comment);
     }
 
     @Override
     @Transactional(readOnly = true)
     public CommentDto findCommentById(Long commentId) {
-        var comment = commentRepository.findById(commentId).orElseThrow(()-> new NoSuchElementException("해당 댓글은 존재하지 않습니다"));
+        var comment = commentRepository.findById(commentId).orElseThrow(()-> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
         return CommentDto.of(comment);
     }
 
@@ -69,7 +71,7 @@ public class CommentServiceImpl implements CommentService{
     @Override
     @Transactional(readOnly = true)
     public Page<Comment> findAllByPostId(Long postId, Pageable pageable) {
-        postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException("해당 게시글은 존재하지 않습니다"));
+        postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
         Page<Comment> commentPage = commentRepository.findAllByPostId(postId, pageable);
         return commentPage;
     }
@@ -78,7 +80,7 @@ public class CommentServiceImpl implements CommentService{
     @Override
     @Transactional(readOnly = true)
     public Page<Comment> findAllByUserId(String userId, Pageable pageable) {
-        userRepository.findByUserId(userId).orElseThrow(()-> new NoSuchElementException("해당 유저는 존재하지 않습니다"));
+        userRepository.findByUserId(userId).orElseThrow(()-> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
         Page<Comment> commentPage = commentRepository.findAllByUserId(userId, pageable);
         return commentPage;
     }
