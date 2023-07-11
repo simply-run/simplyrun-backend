@@ -155,6 +155,7 @@ class PostControllerTest {
         final String content = "content";
         final String updateContent = "update content";
         final List<PostImage> postImages = new ArrayList<>();
+        User user = User.builder().id(1L).build();
 
         Post post = Post.builder()
                 .id(1L)
@@ -167,6 +168,8 @@ class PostControllerTest {
         PostDto.PostRequestDto postDto = PostDto.PostRequestDto.builder()
                 .title(updateTitle)
                 .content(updateContent)
+                .user(UserDto.of(user))
+                .category(Post.CategoryEnum.COMMUNITY)
                 .build();
 
         String requestBody = objectMapper.writeValueAsString(postDto);
