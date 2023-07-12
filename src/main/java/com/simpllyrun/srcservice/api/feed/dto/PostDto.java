@@ -7,6 +7,7 @@ import com.simpllyrun.srcservice.api.feed.domain.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,10 +20,8 @@ public class PostDto {
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @Builder
-    public static class PostRequestDto{
-        @NotNull
-        @Schema(description = "게시글 작성자", requiredMode = Schema.RequiredMode.REQUIRED)
-        private UserDto user;
+    @Schema(description = "게시글 생성에 필요한 내용")
+    public static class PostRequestDto {
 
         @NotNull
         @Schema(description = "게시글 제목", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -35,13 +34,15 @@ public class PostDto {
         @Schema(description = "게시글 카테고리", requiredMode = Schema.RequiredMode.REQUIRED)
         private Post.CategoryEnum category;
 
+        @Schema(description = "사진이나 동영상")
+        private List<MultipartFile> multipartFiles;
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @Builder
-    public static class PostResponseDto{
+    public static class PostResponseDto {
         @Schema(description = "게시글 아이디(번호)", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long postId;
 
@@ -103,9 +104,6 @@ public class PostDto {
             postDto.setDateUpdated(post.getDateUpdated());
             return postDto;
 
-    }
-
-
-
+        }
     }
 }

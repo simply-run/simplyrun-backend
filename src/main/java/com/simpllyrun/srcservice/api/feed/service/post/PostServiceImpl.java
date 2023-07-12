@@ -10,6 +10,7 @@ import com.simpllyrun.srcservice.api.feed.repository.PostImageRepository;
 import com.simpllyrun.srcservice.api.feed.repository.post.PostRepository;
 import com.simpllyrun.srcservice.api.feed.service.postImage.PostImageService;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
+import com.simpllyrun.srcservice.global.error.SrcException;
 import com.simpllyrun.srcservice.global.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.simpllyrun.srcservice.global.error.ErrorCode.INPUT_VALUE_INVALID;
+import static com.simpllyrun.srcservice.global.error.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -35,19 +37,19 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Long createPost(PostDto.PostRequestDto postDto, List<MultipartFile> multipartFiles) {
+    public Long createPost(PostDto.PostRequestDto postDto) {
 
         List<PostImage> postImages = new ArrayList<>();
         Long userId = AuthUtil.getAuthUserId();
         var user = userRepository.findById(userId)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new SrcException(USER_NOT_FOUND));
 
         var post = postRepository.save(PostDtoMapper.toEntity(postDto, user));
         post.updateImage(postImages);
 
         // 이미지 저장 로직 추가
-        if (multipartFiles != null){
-            List<PostImageDto> postImageDtoList = postImageService.uploadImage(multipartFiles);
+        if (postDto.getMultipartFiles() != null) {
+            List<PostImageDto> postImageDtoList = postImageService.uploadImage(postDto.getMultipartFiles());
             for (PostImageDto postImageDto : postImageDtoList) {
                 PostImage postImage = ImageDtoMapper.toEntity(postImageDto);
                 postImage.setPost(post);
@@ -61,7 +63,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void deletePost(Long postId) {
-        var post = postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
+        var post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
 
         postRepository.delete(post);
     }
@@ -69,10 +71,10 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void updatePost(Long postId, PostDto.PostRequestDto postDto, List<MultipartFile> multipartFiles) {
-        var post = postRepository.findById(postId).orElseThrow(()-> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
+        var post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
         List<PostImage> postImages = post.getPostImages();
 
-        if (multipartFiles != null){
+        if (multipartFiles != null) {
             List<PostImageDto> postImageDtoList = postImageService.uploadImage(multipartFiles);
             for (PostImageDto postImageDto : postImageDtoList) {
                 PostImage postImage = ImageDtoMapper.toEntity(postImageDto);
@@ -89,14 +91,15 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     public PostDto.PostResponseDto findPostById(Long postId) {
         Post findPost = postRepository.findByIdFetchJoin(postId);
-       var postDto= PostDto.PostResponseDto.of(findPost);
+        var postDto = PostDto.PostResponseDto.of(findPost);
         return postDto;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<Post> findAllByUserId(String userId, Pageable pageable) {
-        userRepository.findByUserId(userId).orElseThrow(NoSuchElementException::new);
+        userRepository.findByUserId(userId)
+                .orElseThrow(() -> new SrcException(USER_NOT_FOUND));
         return postRepository.findAllByUserId(userId, pageable);
     }
 

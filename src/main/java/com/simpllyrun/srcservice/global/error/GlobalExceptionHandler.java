@@ -29,6 +29,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error(e.getMessage(), e);
+        if (e.getClass().equals(SrcException.class)) {
+            return ResponseEntity.badRequest().body(ErrorResponse.of(((SrcException) e).getErrorCode()));
+        }
         return ResponseEntity.badRequest().body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 }

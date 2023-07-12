@@ -27,10 +27,9 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "게시글 작성", description = "스웨거에선 작동x , 포스트맨에서는 작동o")
-    public ResponseEntity<Long> addPost(@RequestPart(value = "dto") @Valid @Parameter(name = "postDto", description = "게시글 생성에 필요한 내용") PostDto.PostRequestDto postDto,
-                                        @RequestPart(value = "multipartFiles", required = false) @Parameter(name = "multipartFiles", description = "사진이나 동영상") List<MultipartFile> multipartFiles){
-        Long postId = postService.createPost(postDto, multipartFiles);
+    @Operation(summary = "게시글 작성")
+    public ResponseEntity<Long> addPost(@Valid @ModelAttribute PostDto.PostRequestDto postDto){
+        Long postId = postService.createPost(postDto);
         if (postId == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -69,7 +68,7 @@ public class PostController {
         }
     }
 
-    @GetMapping("/list/{userId}")
+    @GetMapping("/users/{userId}")
     @Operation(summary = "userId의 게시글 전체 조회")
     public ResponseEntity<Page<PostDto.PostResponseDto>> findAllPostByUserId(@Parameter(name = "userId", description = "사용자 아이디,, 예)invigorating92 ")
                                                                  @PathVariable("userId") String userId,
@@ -81,7 +80,7 @@ public class PostController {
         return ResponseEntity.ok(postDtoPage);
     }
 
-    @GetMapping("/list")
+    @GetMapping
     @Operation(summary = "게시글 전체 조회")
     public ResponseEntity<Page<PostDto.PostResponseDto>> findAllPost(@PageableDefault(page = 0, size = 10) @Parameter(name = "pageable", hidden = true) Pageable pageable){
 

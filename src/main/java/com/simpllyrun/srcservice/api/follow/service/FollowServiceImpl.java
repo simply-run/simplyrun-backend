@@ -5,13 +5,15 @@ import com.simpllyrun.srcservice.api.follow.dto.FollowerDto;
 import com.simpllyrun.srcservice.api.follow.repository.FollowRepository;
 import com.simpllyrun.srcservice.api.user.domain.User;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
+import com.simpllyrun.srcservice.global.error.SrcException;
 import com.simpllyrun.srcservice.global.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+
+import static com.simpllyrun.srcservice.global.error.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +28,9 @@ public class FollowServiceImpl implements FollowService {
         Long userId = AuthUtil.getAuthUserId();
 
         User user = userRepository.findById(userId)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new SrcException(USER_NOT_FOUND));
         User followUser = userRepository.findById(followUserId)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new SrcException(USER_NOT_FOUND));
 
         var userFollow = Follow.builder()
                 .followUser(user)
@@ -52,7 +54,7 @@ public class FollowServiceImpl implements FollowService {
         Long userId = AuthUtil.getAuthUserId();
 
         User user = userRepository.findByUserId(targetUserId)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new SrcException(USER_NOT_FOUND));
 
         return followRepository.findFollowings(userId, user.getId());
     }
@@ -63,7 +65,7 @@ public class FollowServiceImpl implements FollowService {
         Long userId = AuthUtil.getAuthUserId();
 
         User user = userRepository.findByUserId(targetUserId)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new SrcException(USER_NOT_FOUND));
 
         return followRepository.findFollowers(userId, user.getId());
     }

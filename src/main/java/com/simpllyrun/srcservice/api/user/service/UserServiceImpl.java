@@ -2,11 +2,12 @@ package com.simpllyrun.srcservice.api.user.service;
 
 import com.simpllyrun.srcservice.api.user.domain.User;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
+import com.simpllyrun.srcservice.global.error.SrcException;
 import com.simpllyrun.srcservice.global.util.AuthUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
+import static com.simpllyrun.srcservice.global.error.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @AllArgsConstructor
@@ -18,6 +19,7 @@ public class UserServiceImpl implements UserService {
     public User getUser() {
         Long userId = AuthUtil.getAuthUserId();
 
-        return userRepository.findById(userId).orElseThrow(NoSuchElementException::new);
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new SrcException(USER_NOT_FOUND));
     }
 }

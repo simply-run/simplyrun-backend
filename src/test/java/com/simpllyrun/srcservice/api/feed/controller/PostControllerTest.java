@@ -24,6 +24,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -74,27 +76,6 @@ class PostControllerTest {
     @WithMockUser(username = "1")
     void addPost() throws Exception {
         //given
-        var user = User.builder().build();
-        UserDto userDto = UserDto.of(user);
-
-        //================== @RequestPart(value = "dto") @Valid PostDto postDto ======================
-            //postDto 생성
-        PostDto.PostRequestDto postDto = PostDto.PostRequestDto.builder()
-                .title("title")
-                .content("content")
-                .category(Post.CategoryEnum.COMMUNITY)
-                .user(userDto)
-                .build();
-
-            //postDto -> requestBody (json 형식으로 변환)
-        String requestBody = objectMapper.writeValueAsString(postDto);
-
-            //requestBody -> multipartFile 형식으로 변환  //MockMultipartFile의 name은 @RequestPart의 value 값과 같아야 함 (dto)
-        MockMultipartFile dto = new MockMultipartFile("dto", "", MediaType.APPLICATION_JSON_VALUE, requestBody.getBytes(StandardCharsets.UTF_8));
-
-        //===================== @RequestPart(value = "images") List<MultipartFile> multipartFiles =========================
-            //이미지 파일 생성
-            //MockMultipartFile의 name은 @RequestPart의 value 값과 같아야 함 (images)
         MockMultipartFile imageFile1 = new MockMultipartFile("multipartFiles", "고양이.png", MediaType.IMAGE_PNG_VALUE, "images".getBytes()); //이 방식도 가능
         MockMultipartFile imageFile2 = new MockMultipartFile("multipartFiles", "호랑이.png", "image/png", "<<png data>>".getBytes());
 
@@ -102,13 +83,26 @@ class PostControllerTest {
         multipartFiles.add(imageFile1);
         multipartFiles.add(imageFile2);
 
-        //===============================================================================
+        PostDto.PostRequestDto postDto = PostDto.PostRequestDto.builder()
+                .title("title")
+                .content("content")
+                .category(Post.CategoryEnum.COMMUNITY)
+                .multipartFiles(multipartFiles)
+                .build();
 
-        given(postService.createPost(postDto, multipartFiles)).willReturn(1L);
+        MultiValueMap<String,String> params = new LinkedMultiValueMap<>();
+        params.add("title", postDto.getTitle());
+        params.add("content", postDto.getContent());
+        params.add("category", postDto.getCategory().toString());
+
+
+        given(postService.createPost(postDto)).willReturn(1L);
 
         //when
         ResultActions result = mockMvc.perform(multipart("/api/posts")
-                .file(imageFile1).file(imageFile2).file(dto)
+                .file(imageFile1)
+                .file(imageFile2)
+                .params(params)
                 .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 .characterEncoding("UTF-8"));
 
@@ -116,7 +110,6 @@ class PostControllerTest {
         //then
         result.andExpect(status().isOk())
                 .andDo(print());
-
     }
 
     @DisplayName("Post 삭제하기")
@@ -168,7 +161,6 @@ class PostControllerTest {
         PostDto.PostRequestDto postDto = PostDto.PostRequestDto.builder()
                 .title(updateTitle)
                 .content(updateContent)
-                .user(UserDto.of(user))
                 .category(Post.CategoryEnum.COMMUNITY)
                 .build();
 
@@ -239,7 +231,7 @@ class PostControllerTest {
     @Test
     void findAllByUserId() throws Exception {
         //given
-        final String URL = "/api/posts/list/{userId}";
+        final String URL = "/api/posts/users/{userId}";
 
         User user1 = User.builder().id(1L)
                 .userId("user1").build();
@@ -272,7 +264,7 @@ class PostControllerTest {
     @Test
     void findAllPost() throws Exception {
         //given
-        final String URL = "/api/posts/list";
+        final String URL = "/api/posts";
 
         User user1 = User.builder().id(1L)
                 .userId("user1").build();

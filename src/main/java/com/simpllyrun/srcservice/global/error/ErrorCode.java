@@ -9,6 +9,7 @@ public enum ErrorCode {
 
     //400
     INPUT_VALUE_INVALID(400, "유효하지 않은 입력입니다."),
+    USER_NOT_FOUND(400, "존재 하지 않는 유저입니다."),
     // 403
     FORBIDDEN(403, "접근 권한이 없습니다."),
 

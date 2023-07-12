@@ -61,9 +61,17 @@ class PostServiceTest {
         // given
         var toUser = User.builder()
                 .build();
+
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        MockMultipartFile file1 = new MockMultipartFile("multipartFiles", "hello.png", MediaType.IMAGE_PNG_VALUE, "hello, world!".getBytes());
+        MockMultipartFile file2 = new MockMultipartFile("multipartFiles", "byebye.png", MediaType.IMAGE_PNG_VALUE, "hello, world!".getBytes());
+        multipartFiles.add(file1);
+        multipartFiles.add(file2);
+
         var postDto = PostDto.PostRequestDto.builder()
                 .title("title")
                 .content("test")
+                .multipartFiles(multipartFiles)
                 .build();
 
         var result = Post.builder()
@@ -72,18 +80,12 @@ class PostServiceTest {
                 .user(toUser)
                 .build();
 
-        List<MultipartFile> multipartFiles = new ArrayList<>();
-        MockMultipartFile file1 = new MockMultipartFile("multipartFiles", "hello.png", MediaType.IMAGE_PNG_VALUE, "hello, world!".getBytes());
-        MockMultipartFile file2 = new MockMultipartFile("multipartFiles", "byebye.png", MediaType.IMAGE_PNG_VALUE, "hello, world!".getBytes());
-        multipartFiles.add(file1);
-        multipartFiles.add(file2);
-
         given(userRepository.findById(anyLong())).willReturn(Optional.of(toUser));
         given(postRepository.save(any())).willReturn(result);
         given(postRepository.findById(anyLong())).willReturn(Optional.of(result));
 
         // when
-        var postId = postService.createPost(postDto, multipartFiles);
+        var postId = postService.createPost(postDto);
 
         // then
         verify(postRepository).save(any());
