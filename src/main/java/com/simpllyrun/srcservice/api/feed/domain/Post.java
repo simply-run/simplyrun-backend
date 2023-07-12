@@ -59,4 +59,7 @@ public class Post extends BaseDomain {
     public void updateImage(List<PostImage> postImages){this.postImages = postImages;}
     public void updateComments(List<Comment> comments){this.comments = comments;}
     public void updatePostLikes(List<PostLike> postLikes){this.postLikes = postLikes;}
+    public void setComments(List<Comment> comments) {
+        this.comments.addAll(comments);
+    }
 }

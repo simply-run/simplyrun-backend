@@ -33,7 +33,7 @@ public class FollowServiceImpl implements FollowService {
                 .orElseThrow(() -> new SrcException(USER_NOT_FOUND));
 
         var userFollow = Follow.builder()
-                .followUser(user)
+                .user(user)
                 .followUser(followUser)
                 .build();
 

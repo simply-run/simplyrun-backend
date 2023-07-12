@@ -29,6 +29,10 @@ public class User extends BaseDomain {
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
 
     public void update(String name, String email, String imageUrl) {
         if (name != null && !name.equals(this.name)) {
