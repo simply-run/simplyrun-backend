@@ -14,9 +14,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,11 +43,10 @@ public class PostController {
     }
 
     @PutMapping(value = "/{postId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "게시글 수정", description = "스웨거에선 작동x , 포스트맨에서는 작동o")
+    @Operation(summary = "게시글 수정")
     public ResponseEntity<Void> updatePost(@PathVariable @Parameter(name = "postId", description = "수정할 게시글의 id값") Long postId,
-                                           @RequestPart(value = "dto") @Valid @Parameter(name = "postDto", description = "게시글 수정에 필요한 내용") PostDto.PostRequestDto postDto,
-                                           @RequestPart(value = "multipartFiles", required = false) @Parameter(name = "multipartFiles", description = "사진이나 동영상") List<MultipartFile> multipartFiles){
-        postService.updatePost(postId, postDto, multipartFiles);
+                                           @Valid @ModelAttribute PostDto.PostRequestDto postDto){
+        postService.updatePost(postId, postDto);
 
         return ResponseEntity.ok().build();
     }
@@ -75,7 +71,7 @@ public class PostController {
                                                              @PageableDefault(page = 0, size = 10) @Parameter(name = "pageable", hidden = true) Pageable pageable){
 
         Page<Post> findPostPage = postService.findAllByUserId(userId, pageable);
-        Page<PostDto.PostResponseDto> postDtoPage = findPostPage.map(post -> PostDto.PostResponseDto.of(post));
+        Page<PostDto.PostResponseDto> postDtoPage = findPostPage.map(PostDto.PostResponseDto::of);
 
         return ResponseEntity.ok(postDtoPage);
     }
@@ -85,7 +81,7 @@ public class PostController {
     public ResponseEntity<Page<PostDto.PostResponseDto>> findAllPost(@PageableDefault(page = 0, size = 10) @Parameter(name = "pageable", hidden = true) Pageable pageable){
 
         Page<Post> findAll = postService.findAll(pageable);
-        Page<PostDto.PostResponseDto> postDtoPage = findAll.map(post -> PostDto.PostResponseDto.of(post));
+        Page<PostDto.PostResponseDto> postDtoPage = findAll.map(PostDto.PostResponseDto::of);
 
         return ResponseEntity.ok(postDtoPage);
     }

@@ -8,7 +8,6 @@ import com.simpllyrun.srcservice.api.feed.repository.post.PostRepository;
 
 import com.simpllyrun.srcservice.api.feed.service.post.PostService;
 import com.simpllyrun.srcservice.api.user.domain.User;
-import com.simpllyrun.srcservice.api.user.dto.UserDto;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -147,9 +145,8 @@ class PostControllerTest {
         final String updateTitle = "update title";
         final String content = "content";
         final String updateContent = "update content";
-        final List<PostImage> postImages = new ArrayList<>();
-        User user = User.builder().id(1L).build();
 
+        final List<PostImage> postImages = new ArrayList<>();
         Post post = Post.builder()
                 .id(1L)
                 .title(title)
@@ -157,20 +154,27 @@ class PostControllerTest {
                 .build();
         post.updateImage(postImages);
 
+        final List<MultipartFile> multipartFiles = new ArrayList<>();
+        MockMultipartFile imageFile = new MockMultipartFile("multipartFiles", "update.png", MediaType.IMAGE_PNG_VALUE, "images".getBytes());
+        multipartFiles.add(imageFile);
 
         PostDto.PostRequestDto postDto = PostDto.PostRequestDto.builder()
                 .title(updateTitle)
                 .content(updateContent)
                 .category(Post.CategoryEnum.COMMUNITY)
+                .multipartFiles(multipartFiles)
                 .build();
 
-        String requestBody = objectMapper.writeValueAsString(postDto);
-        MockMultipartFile dto = new MockMultipartFile("dto", "", MediaType.APPLICATION_JSON_VALUE, requestBody.getBytes(StandardCharsets.UTF_8));
-        MockMultipartFile imageFile = new MockMultipartFile("multipartFiles", "update.png", MediaType.IMAGE_PNG_VALUE, "images".getBytes());
+        MultiValueMap<String,String> params = new LinkedMultiValueMap<>();
+        params.add("title", postDto.getTitle());
+        params.add("content", postDto.getContent());
+        params.add("category", postDto.getCategory().toString());
 
         //when
         ResultActions result = mockMvc.perform(multipart(HttpMethod.PUT, URL, post.getId())
-                .file(dto).file(imageFile));
+                .file(imageFile).params(params)
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .characterEncoding("UTF-8"));
 
         //then
         result.andExpect(status().isOk()).andDo(print());

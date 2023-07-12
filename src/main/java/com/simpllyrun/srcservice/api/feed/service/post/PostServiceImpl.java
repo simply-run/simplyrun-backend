@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,12 +69,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void updatePost(Long postId, PostDto.PostRequestDto postDto, List<MultipartFile> multipartFiles) {
+    public void updatePost(Long postId, PostDto.PostRequestDto postDto) {
         var post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException(String.valueOf(INPUT_VALUE_INVALID)));
         List<PostImage> postImages = post.getPostImages();
 
-        if (multipartFiles != null) {
-            List<PostImageDto> postImageDtoList = postImageService.uploadImage(multipartFiles);
+        if (postDto.getMultipartFiles() != null) {
+            List<PostImageDto> postImageDtoList = postImageService.uploadImage(postDto.getMultipartFiles());
             for (PostImageDto postImageDto : postImageDtoList) {
                 PostImage postImage = ImageDtoMapper.toEntity(postImageDto);
                 postImages.add(postImage);
@@ -91,8 +90,7 @@ public class PostServiceImpl implements PostService {
     @Transactional(readOnly = true)
     public PostDto.PostResponseDto findPostById(Long postId) {
         Post findPost = postRepository.findByIdFetchJoin(postId);
-        var postDto = PostDto.PostResponseDto.of(findPost);
-        return postDto;
+        return PostDto.PostResponseDto.of(findPost);
     }
 
     @Override
@@ -106,8 +104,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     public Page<Post> findAll(Pageable pageable) {
-        Page<Post> findAll = postRepository.findAll(pageable);
-        return findAll;
+        return postRepository.findAll(pageable);
     }
 
 

@@ -92,8 +92,9 @@ class PostServiceTest {
 
         System.out.println("postId = " + postId);
         assertThat(postId).isEqualTo(1L);
-        Post post = postRepository.findById(postId).get();
-        assertThat(post.getPostImages().get(0).getOriginalFilename()).isEqualTo("hello.png");
+        Optional<Post> post = postRepository.findById(postId);
+        assertThat(post).isPresent();
+        assertThat(post.get().getPostImages().get(0).getOriginalFilename()).isEqualTo("hello.png");
     }
 
     @Nested
@@ -148,11 +149,11 @@ class PostServiceTest {
 
         Post post = Post.builder()
                 .id(postId)
-                .title(content1)
+                .title(title1)
                 .content(content1)
                 .build();
 
-        PostDto.PostRequestDto postDto = PostDto.PostRequestDto.builder().title(title2).content(content2).build();
+        PostDto.PostRequestDto postDto = PostDto.PostRequestDto.builder().title(title2).content(content2).multipartFiles(multipartFiles).build();
 
         @Test
         @WithMockUser(username = "1")
@@ -174,7 +175,7 @@ class PostServiceTest {
             System.out.println("Before-update content = " + post.getContent());
 
             //when
-            postService.updatePost(postId, postDto, multipartFiles);
+            postService.updatePost(postId, postDto);
 
             //then
             verify(postRepository).save(post);
@@ -197,7 +198,7 @@ class PostServiceTest {
             given(postRepository.findById(1L)).willReturn(Optional.of(post));
 
             //exception 테스트 (없는 id 넣기)
-            assertThatCode(()->postService.updatePost(2L, postDto, multipartFiles))
+            assertThatCode(()->postService.updatePost(2L, postDto))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }
