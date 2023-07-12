@@ -1,7 +1,9 @@
 package com.simpllyrun.srcservice.api.feed.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.simpllyrun.srcservice.api.feed.domain.Comment;
 import com.simpllyrun.srcservice.api.feed.domain.PostImage;
+import com.simpllyrun.srcservice.api.user.domain.User;
 import com.simpllyrun.srcservice.api.user.dto.UserDto;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,6 +12,7 @@ import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,9 +42,9 @@ public class PostDto {
     }
 
     @Data
+    @Builder
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @Builder
     public static class PostResponseDto {
         @Schema(description = "게시글 아이디(번호)", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long postId;
@@ -69,7 +72,7 @@ public class PostDto {
         private LocalDateTime dateUpdated;
 
         @Schema(description = "게시글 이미지", requiredMode = Schema.RequiredMode.REQUIRED)
-        private List<String> postImages;
+        private List<PostImageDto> postImages;
 
         @Schema(description = "게시글 댓글", requiredMode = Schema.RequiredMode.REQUIRED)
         private List<CommentDto> recentComments;
@@ -79,6 +82,21 @@ public class PostDto {
 
         @Schema(description = "게시글 좋아요 수", requiredMode = Schema.RequiredMode.REQUIRED)
         private Long postLikesCount;
+
+        @QueryProjection
+        public PostResponseDto(Long postId, User user, String title, String content, Post.CategoryEnum category,
+                               LocalDateTime dateCreated, LocalDateTime dateUpdated, Integer commentsCount,
+                               Integer postLikesCount) {
+            this.postId = postId;
+            this.user = UserDto.of(user);
+            this.title = title;
+            this.content = content;
+            this.category = category;
+            this.dateCreated = dateCreated;
+            this.dateUpdated = dateUpdated;
+            this.commentsCount = commentsCount.longValue();
+            this.postLikesCount = postLikesCount.longValue();
+        }
 
         public static PostResponseDto of(Post post) {
 
@@ -91,15 +109,15 @@ public class PostDto {
                     .build();
 
             List<PostImage> postImages = post.getPostImages();
-            List<String> postImageList = postImages.stream().map(pi -> pi.getPostImageUrl()).collect(Collectors.toList());
+            List<PostImageDto> postImageList = postImages.stream().map(PostImageDto::of).collect(Collectors.toList());
 
             List<Comment> comments = post.getComments();
-            List<CommentDto> commentDtoList = comments.stream().map(c -> CommentDto.of(c)).collect(Collectors.toList());
+            List<CommentDto> commentDtoList = comments.stream().map(CommentDto::of).collect(Collectors.toList());
 
             postDto.setRecentComments(commentDtoList);
             postDto.setPostImages(postImageList);
-            postDto.setCommentsCount(Long.valueOf(comments.size()));
-            postDto.setPostLikesCount(Long.valueOf(post.getPostLikes().size()));
+            postDto.setCommentsCount((long) comments.size());
+            postDto.setPostLikesCount((long) post.getPostLikes().size());
             postDto.setDateCreated(post.getDateCreated());
             postDto.setDateUpdated(post.getDateUpdated());
             return postDto;

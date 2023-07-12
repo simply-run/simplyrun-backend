@@ -51,6 +51,11 @@ public class OAuthService extends DefaultOAuth2UserService {
             updateUser(savedUser, authUserInfo);
         } else {
             savedUser = createUser(authUserInfo, providerType);
+            User userDuplicate = userRepository.findByUserId(savedUser.getUserId())
+                    .orElse(null);
+            if(userDuplicate != null) {
+                savedUser.setUserId(savedUser.getUserId() + "_" + savedUser.getUserOAuthId().substring(0, 5));
+            }
         }
         userRepository.saveAndFlush(savedUser);
 

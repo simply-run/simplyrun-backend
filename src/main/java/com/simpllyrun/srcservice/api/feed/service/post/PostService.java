@@ -17,5 +17,5 @@ public interface PostService {
     PostDto.PostResponseDto findPostById(Long postId);
     Page<Post> findAllByUserId(String userId, Pageable pageable);
 
-    Page<Post> findAll(Pageable pageable);
+    Page<PostDto.PostResponseDto> findAll(Pageable pageable);
 }

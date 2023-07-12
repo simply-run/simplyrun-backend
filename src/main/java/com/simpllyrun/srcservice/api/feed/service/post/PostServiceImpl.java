@@ -105,10 +105,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Post> findAll(Pageable pageable) {
-        Page<Post> findAll = postRepository.findAll(pageable);
-        return findAll;
+    public Page<PostDto.PostResponseDto> findAll(Pageable pageable) {
+        Long userIdentity = AuthUtil.getAuthUserId();
+
+        return postRepository.findPostDtoOfFollowingByUserIdentity(userIdentity, pageable);
     }
-
-
 }

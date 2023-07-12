@@ -35,12 +35,12 @@ public class AuthUserInfo {
     // 향후 추상화
     private static AuthUserInfo ofKakao(Map<String, Object> attributes) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");// 카카오로 받은 데이터에서 계정 정보가 담긴 kakao_account 값 꺼냄
-        Map<String, Object> profile = (Map<String, Object>) attributes.get("profile");
+        Map<String, Object> profile = (Map<String, Object>) attributes.get("properties");
 
         return AuthUserInfo.builder()
-                .id((String) profile.get("id"))
+                .id(String.valueOf(attributes.get("id")))
                 .name((String) profile.get("nickname"))
-                .email((String) profile.get("email"))
+                .email((String) kakaoAccount.get("email"))
                 .imageUrl((String) profile.get("thumbnail_image"))
                 .attributes(attributes)
                 .build();
@@ -50,7 +50,7 @@ public class AuthUserInfo {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
         return AuthUserInfo.builder()
-                .id((String) response.get("id"))
+                .id(String.valueOf(response.get("id")))
                 .name((String) response.get("name"))
                 .email((String) response.get("email"))
                 .imageUrl((String) response.get("profile_image"))

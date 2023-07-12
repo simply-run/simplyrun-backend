@@ -3,17 +3,17 @@ package com.simpllyrun.srcservice.api.feed.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.simpllyrun.srcservice.api.feed.domain.PostImage;
 import com.simpllyrun.srcservice.api.feed.domain.Post;
+import com.simpllyrun.srcservice.api.feed.domain.PostImage;
 import com.simpllyrun.srcservice.api.feed.dto.PostDto;
 import com.simpllyrun.srcservice.api.feed.repository.PostImageRepository;
 import com.simpllyrun.srcservice.api.feed.repository.post.PostRepository;
-
 import com.simpllyrun.srcservice.api.feed.service.post.PostService;
 import com.simpllyrun.srcservice.api.user.domain.User;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
-import org.junit.jupiter.api.*;
-
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -98,11 +98,12 @@ class PostServiceTest {
 
     @Nested
     @DisplayName("Post 삭제 테스트")
-    class deleteTest{
+    class deleteTest {
         Post post = Post.builder()
                 .id(1L)
                 .content("content")
                 .build();
+
         @Test
         @WithMockUser(username = "1")
         @DisplayName("삭제 성공")
@@ -121,7 +122,7 @@ class PostServiceTest {
         @Test
         @WithMockUser(username = "1")
         @DisplayName("NoSuchElementException 테스트")
-        void exceptionTest(){
+        void exceptionTest() {
             given(postRepository.findById(1L)).willReturn(Optional.empty());
             //exception 테스트 (없는 id 넣기)
             assertThatThrownBy(() -> postService.deletePost(1L))
@@ -132,7 +133,7 @@ class PostServiceTest {
 
     @Nested
     @DisplayName("Post 수정 테스트")
-    class updateTest{
+    class updateTest {
 
         final Long postId = 1L;
         final String title1 = "Before change title";
@@ -157,7 +158,7 @@ class PostServiceTest {
         @Test
         @WithMockUser(username = "1")
         @DisplayName("Post 수정 성공")
-        void updatePost(){
+        void updatePost() {
             postImages.add(postImage);
             post.updateImage(postImages);
             //given
@@ -186,25 +187,25 @@ class PostServiceTest {
             System.out.println("postId = " + post.getId());
             System.out.println("postImages size = " + post.getPostImages().size());
             assertThat(post.getPostImages().get(1).getOriginalFilename()).isEqualTo("serviceUpdate.png");
-            System.out.println("postImage originalFilename = "+ post.getPostImages().get(1).getOriginalFilename());
+            System.out.println("postImage originalFilename = " + post.getPostImages().get(1).getOriginalFilename());
 
         }
 
         @Test
         @DisplayName("NoSuchElementException 테스트")
-        void exceptionTest(){
+        void exceptionTest() {
             System.out.println("postId = " + post.getId());
             given(postRepository.findById(1L)).willReturn(Optional.of(post));
 
             //exception 테스트 (없는 id 넣기)
-            assertThatCode(()->postService.updatePost(2L, postDto, multipartFiles))
+            assertThatCode(() -> postService.updatePost(2L, postDto, multipartFiles))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }
 
     @Nested
     @DisplayName("Post 조회 테스트")
-    class findTest{
+    class findTest {
         User user = User.builder()
                 .id(1L)
                 .userId("khw")
@@ -252,26 +253,22 @@ class PostServiceTest {
 
         @Test
         @DisplayName("Post 전체 조회")
+        @WithMockUser(username = "1")
         void findAll() throws JsonProcessingException {
             //given
-            List<Post> postList = new ArrayList<>();
-            postList.add(post);
-            postList.add(post2);
-            postList.add(post3);
+            List<PostDto.PostResponseDto> postList = new ArrayList<>();
+            postList.add(PostDto.PostResponseDto.builder().postId(1L).title("title").content("content").build());
 
             PageRequest pageRequest = PageRequest.of(0, 10);
-            PageImpl<Post> postPageImpl = new PageImpl<>(postList, pageRequest, postList.size());
+            PageImpl<PostDto.PostResponseDto> postPageImpl = new PageImpl<>(postList, pageRequest, postList.size());
 
-            given(postRepository.findAll(pageRequest)).willReturn(postPageImpl);
+            given(postRepository.findPostDtoOfFollowingByUserIdentity(1L, pageRequest)).willReturn(postPageImpl);
 
             //when
-            Page<Post> findAll = postService.findAll(pageRequest);
+            Page<PostDto.PostResponseDto> findAll = postService.findAll(pageRequest);
 
             //then
-            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(findAll));
             assertThat(findAll.getTotalElements()).isEqualTo(postPageImpl.getTotalElements());
         }
     }
-
-
 }

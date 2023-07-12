@@ -263,24 +263,26 @@ class PostControllerTest {
     @DisplayName("post 전체 조회하기")
     @Test
     void findAllPost() throws Exception {
-        //given
         final String URL = "/api/posts";
 
-        User user1 = User.builder().id(1L)
-                .userId("user1").build();
+        //given
+        PostDto.PostResponseDto post = PostDto.PostResponseDto.builder()
+                .postId(1L)
+                .title("title1")
+                .content("content1")
+                .category(Post.CategoryEnum.COMMUNITY)
+                .user(UserDto.builder()
+                        .id(1L)
+                        .userId("testUser")
+                        .build())
+                .build();
 
-        List<Post> postList = new ArrayList<>();
-        Post post1 = Post.builder().id(1L).title("title1").content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        Post post2 = Post.builder().id(2L).title("title2").content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        Post post3 = Post.builder().id(3L).title("title3").content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        postList.add(post1);
-        postList.add(post2);
-        postList.add(post3);
-
+        List<PostDto.PostResponseDto> postList = List.of(post);
         PageRequest pageRequest = PageRequest.of(0, 10);
-        PageImpl<Post> postPageImpl = new PageImpl<>(postList, pageRequest, postList.size());
 
+        PageImpl<PostDto.PostResponseDto> postPageImpl = new PageImpl<>(postList, pageRequest, postList.size());
         given(postService.findAll(any())).willReturn(postPageImpl);
+
         //when
         ResultActions result = mockMvc.perform(get(URL, pageRequest));
 
