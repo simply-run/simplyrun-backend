@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostImageServiceImpl implements PostImageService {
 
-    private final PostImageRepository postImageRepository;
+//    private final PostImageRepository postImageRepository;
     private final FileStore fileStore;
 
     @Value("${spring.servlet.multipart.location}")

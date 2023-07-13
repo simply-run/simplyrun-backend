@@ -33,7 +33,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostImageService postImageService;
-    private final PostImageRepository postImageRepository;
+//    private final PostImageRepository postImageRepository;
 
     @Override
     @Transactional
@@ -53,7 +53,7 @@ public class PostServiceImpl implements PostService {
             for (PostImageDto postImageDto : postImageDtoList) {
                 PostImage postImage = ImageDtoMapper.toEntity(postImageDto);
                 postImage.setPost(post);
-                postImageRepository.save(postImage);
+//                postImageRepository.save(postImage);
                 postImages.add(postImage);
             }
         }
