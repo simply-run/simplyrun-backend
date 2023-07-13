@@ -13,9 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.group.GroupBy.list;
-import static com.simpllyrun.srcservice.api.feed.domain.QComment.comment;
 import static com.simpllyrun.srcservice.api.feed.domain.QPost.post;
 import static com.simpllyrun.srcservice.api.follow.domain.QFollow.follow;
 import static com.simpllyrun.srcservice.api.user.domain.QUser.user;
@@ -30,15 +27,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     @Transactional
     public Post findByIdFetchJoin(Long postId) {
 
-        Post findPost = jpaQueryFactory.selectFrom(post)
+        return jpaQueryFactory.selectFrom(post)
                 .where(post.id.eq(postId))
                 .leftJoin(post.user).fetchJoin()
                 .leftJoin(post.postImages).fetchJoin()
 //                .leftJoin(post.postLikes).fetchJoin()
 //                .leftJoin(post.comments).fetchJoin()
                 .fetchOne();
-
-        return findPost;
     }
 
     @Override
