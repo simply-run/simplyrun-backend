@@ -11,12 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +38,7 @@ public class PostController {
 
     @DeleteMapping("/{postId}")
     @Operation(summary = "게시글 삭제")
-    public ResponseEntity<Void> deletePost(@PathVariable @Parameter(name = "postId", description = "삭제할 게시글의 id값") Long postId){
+    public ResponseEntity<Void> deletePost(@PathVariable @Parameter(name = "postId", description = "삭제할 게시글의 id값") Long postId) {
         postService.deletePost(postId);
 
         return ResponseEntity.ok().build();
@@ -56,7 +55,7 @@ public class PostController {
 
     @GetMapping("/{postId}")
     @Operation(summary = "게시글 조회")
-    public ResponseEntity<PostDto.PostResponseDto> findPost(@PathVariable @Parameter(name = "postId", description = "조회할 게시글의 id") Long postId){
+    public ResponseEntity<PostDto.PostResponseDto> findPost(@PathVariable @Parameter(name = "postId", description = "조회할 게시글의 id") Long postId) {
 
         PostDto.PostResponseDto postDto = postService.findPostById(postId);
 
@@ -69,26 +68,20 @@ public class PostController {
 
     @GetMapping("/users/{userId}")
     @Operation(summary = "userId의 게시글 전체 조회")
-    public ResponseEntity<Page<PostDto.PostResponseDto>> findAllPostByUserId(@Parameter(name = "userId", description = "사용자 아이디,, 예)invigorating92 ")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<PostDto.PostResponseDto> findAllPostByUserId(@Parameter(name = "userId", description = "사용자 아이디,, 예)invigorating92 ")
                                                                              @PathVariable("userId") String userId,
                                                                              @PageableDefault(page = 0, size = 10) @Parameter(name = "pageable", hidden = true) Pageable pageable) {
-
-        Page<Post> findPostPage = postService.findAllByUserId(userId, pageable);
-        Page<PostDto.PostResponseDto> postDtoPage = findPostPage.map(post -> PostDto.PostResponseDto.of(post));
-
-        return ResponseEntity.ok(postDtoPage);
+        return postService.findAllByUserId(userId, pageable);
     }
 
     @GetMapping
     @Operation(summary = "게시글 전체 조회")
-    public ResponseEntity<Page<PostDto.PostResponseDto>> findAllPost(@PageableDefault(page = 0, size = 10)
-                                                                                    @Parameter(name = "pageable", hidden = true)
-                                                                                    Pageable pageable){
-
-        Page<Post> findAll = postService.findAll(pageable);
-        Page<PostDto.PostResponseDto> postDtoPage = findAll.map(post -> PostDto.PostResponseDto.of(post));
-
-        return ResponseEntity.ok(postDtoPage);
+    @ResponseStatus(HttpStatus.OK)
+    public Page<PostDto.PostResponseDto> findAllPost(@PageableDefault(page = 0, size = 10)
+                                                         @Parameter(name = "pageable", hidden = true)
+                                                         Pageable pageable){
+        return postService.findAll(pageable);
     }
 
 }
