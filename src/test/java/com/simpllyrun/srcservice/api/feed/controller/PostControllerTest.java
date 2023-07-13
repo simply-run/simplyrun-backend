@@ -8,6 +8,7 @@ import com.simpllyrun.srcservice.api.feed.repository.post.PostRepository;
 
 import com.simpllyrun.srcservice.api.feed.service.post.PostService;
 import com.simpllyrun.srcservice.api.user.domain.User;
+import com.simpllyrun.srcservice.api.user.dto.UserDto;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -241,16 +242,18 @@ class PostControllerTest {
                 .userId("user1").build();
 
 
-        List<Post> postList = new ArrayList<>();
-        Post post1 = Post.builder().id(1L).title("title1").content("content1").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        Post post2 = Post.builder().id(2L).title("title2").content("content2").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        Post post3 = Post.builder().id(3L).title("title3").content("content3").categoryType(Post.CategoryEnum.COMMUNITY).user(user1).build();
-        postList.add(post1);
-        postList.add(post2);
-        postList.add(post3);
+        List<PostDto.PostResponseDto> postList = new ArrayList<>();
+        PostDto.PostResponseDto post = PostDto.PostResponseDto.builder()
+                .postId(1L)
+                .title("title1")
+                .content("content1")
+                .category(Post.CategoryEnum.COMMUNITY)
+                .user(UserDto.of(user1)).build();
+        postList.add(post);
+
 
         PageRequest pageRequest = PageRequest.of(0, 10);
-        PageImpl<Post> postPageImpl = new PageImpl<>(postList, pageRequest, postList.size());
+        PageImpl<PostDto.PostResponseDto> postPageImpl = new PageImpl<>(postList, pageRequest, postList.size());
 
         given(userRepository.findByUserId(anyString())).willReturn(Optional.of(user1));
         given(postService.findAllByUserId(anyString(), eq(pageRequest))).willReturn(postPageImpl);
