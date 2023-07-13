@@ -13,7 +13,7 @@ public interface PostService {
     void updatePost(Long postId, PostDto.PostRequestDto postDto);
 
     PostDto.PostResponseDto findPostById(Long postId);
-    Page<Post> findAllByUserId(String userId, Pageable pageable);
+    Page<PostDto.PostResponseDto> findAllByUserId(String userId, Pageable pageable);
 
     Page<PostDto.PostResponseDto> findAll(Pageable pageable);
 }

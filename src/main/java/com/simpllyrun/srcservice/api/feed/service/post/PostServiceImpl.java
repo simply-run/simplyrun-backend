@@ -95,16 +95,18 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Post> findAllByUserId(String userId, Pageable pageable) {
+    public Page<PostDto.PostResponseDto> findAllByUserId(String userId, Pageable pageable) {
         userRepository.findByUserId(userId)
                 .orElseThrow(() -> new SrcException(USER_NOT_FOUND));
-        return postRepository.findAllByUserId(userId, pageable);
+        Page<Post> postPage = postRepository.findAllByUserId(userId, pageable);
+        return postPage.map(PostDto.PostResponseDto::of);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Post> findAll(Pageable pageable) {
-        return postRepository.findAll(pageable);
+    public Page<PostDto.PostResponseDto> findAll(Pageable pageable) {
+        Long userIdentity = AuthUtil.getAuthUserId();
+        return postRepository.findPostDtoOfFollowingByUserIdentity(userIdentity, pageable);
     }
 
 
