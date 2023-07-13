@@ -1,5 +1,8 @@
 package com.simpllyrun.srcservice.api.user.domain;
 
+import lombok.Getter;
+
+@Getter
 public enum AgreementType {
     TERMS_OF_SERVICE("이용 약관 동의"),
     PRIVACY_POLICY("개인정보 처리방침 동의"),
@@ -12,7 +15,4 @@ public enum AgreementType {
         this.displayName = displayName;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
 }

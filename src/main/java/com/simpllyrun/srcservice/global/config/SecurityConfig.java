@@ -48,6 +48,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/api/agreements/**").permitAll()
                 .requestMatchers(AUTH_WHITELIST_SWAGGER).permitAll()
 //                .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/api/**").hasAnyAuthority(RoleType.USER.getKey())

@@ -2,8 +2,11 @@ package com.simpllyrun.srcservice.api.user.service;
 
 import com.simpllyrun.srcservice.api.user.domain.User;
 import com.simpllyrun.srcservice.api.user.domain.UserAgreement;
+import com.simpllyrun.srcservice.api.user.dto.AgreementDto;
 import com.simpllyrun.srcservice.api.user.dto.UserAgreementDto;
+import com.simpllyrun.srcservice.api.user.dto.mapper.AgreementDtoMapper;
 import com.simpllyrun.srcservice.api.user.dto.mapper.UserAgreementDtoMapper;
+import com.simpllyrun.srcservice.api.user.repository.AgreementRepository;
 import com.simpllyrun.srcservice.api.user.repository.UserAgreementRepository;
 import com.simpllyrun.srcservice.api.user.repository.UserRepository;
 import com.simpllyrun.srcservice.global.error.ErrorCode;
@@ -18,14 +21,15 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserAgreementServiceImpl implements UserAgreementService {
+public class AgreementServiceImpl implements AgreementService {
 
     private final UserAgreementRepository userAgreementRepository;
+    private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
 
     @Override
     @Transactional
-    public Long addAgreement(List<UserAgreementDto> userAgreementDtos) {
+    public Long addUserAgreement(List<UserAgreementDto> userAgreementDtos) {
         User user = getUser();
 
         List<UserAgreement> userAgreements = new ArrayList<>();
@@ -40,12 +44,11 @@ public class UserAgreementServiceImpl implements UserAgreementService {
 
     @Override
     @Transactional
-    public void updateAgreement(List<UserAgreementDto> userAgreementDto) {
+    public void updateUserAgreement(List<UserAgreementDto> userAgreementDto) {
         var userAgreements = userAgreementRepository.findAllByUserId(AuthUtil.getAuthUserId());
-        userAgreements.forEach(dto -> {
-            userAgreementDto.stream().filter(item -> item.getAgreementType().equals(dto.getAgreement().getType()))
-                    .findFirst().ifPresent(item -> dto.setAgreed(item.getIsAgree()));
-        });
+        userAgreements.forEach(dto -> userAgreementDto.stream()
+                .filter(item -> item.getAgreementType().equals(dto.getAgreement().getType()))
+                .findFirst().ifPresent(item -> dto.setAgreed(item.getIsAgree())));
 
         userAgreementRepository.saveAll(userAgreements);
     }
@@ -54,6 +57,11 @@ public class UserAgreementServiceImpl implements UserAgreementService {
     public List<UserAgreementDto> getUserAgreements() {
         Long userId = AuthUtil.getAuthUserId();
         return UserAgreementDtoMapper.INSTANCE.toDtos(userAgreementRepository.findAllByUserId(userId));
+    }
+
+    @Override
+    public List<AgreementDto> getAgreements() {
+        return AgreementDtoMapper.INSTANCE.toDtos(agreementRepository.findAll());
     }
 
     private User getUser() {
